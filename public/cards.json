@@ -22,5 +22,13 @@
     "category": "",
     "name": "sk_profile",
     "imageUrl": "./cards/sk_profile.webp"
+  },
+  {
+    "id": "testrun",
+    "era": "trial",
+    "member": "Taehwan",
+    "category": "POB",
+    "name": "testrun",
+    "imageUrl": "./cards/testrun.webp"
   }
 ]
