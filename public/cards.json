@@ -24,18 +24,18 @@
     "imageUrl": ""
   },
   {
-    "id": "hs_test_dk",
+    "id": "hs_test_wt",
     "era": "",
     "member": "Hyesung",
-    "category": "",
+    "category": "Album",
     "name": "White test",
-    "imageUrl": "./cards/hs_test_dk.webp"
+    "imageUrl": "./cards/hs_test_wt.webp"
   },
   {
     "id": "hs_test_dk",
     "era": "",
     "member": "Hyesung",
-    "category": "",
+    "category": "Album",
     "name": "Dark test",
     "imageUrl": "./cards/hs_test_dk.webp"
   }
