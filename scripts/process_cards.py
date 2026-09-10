@@ -188,7 +188,7 @@ def apply_white_balance(img: np.ndarray) -> np.ndarray:
     return cv2.merge([b, g, r])
 
 
-def add_watermark(pil_img: Image.Image, text: str = "VANNER ARCHIVE") -> Image.Image:
+def add_watermark(pil_img: Image.Image, text: str = "VVS ARCHIVE") -> Image.Image:
     """Apply a repeating 45-degree diagonal watermark across the entire image."""
     base = pil_img.convert("RGBA")
     w, h = base.size
@@ -240,7 +240,7 @@ def process_image(img: np.ndarray, output_path: str):
 
     rgb_img = cv2.cvtColor(wb_img, cv2.COLOR_BGR2RGB)
     pil_img = Image.fromarray(rgb_img)
-    watermarked_img = add_watermark(pil_img, text="VANNER ARCHIVE")
+    watermarked_img = add_watermark(pil_img, text="VVS ARCHIVE")
     watermarked_img.save(output_path, "WEBP", quality=85, method=6)
 
 
