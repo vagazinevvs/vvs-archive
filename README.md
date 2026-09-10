@@ -1,75 +1,47 @@
-# React + TypeScript + Vite
+# VVS Archive 💎
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A fast, responsive web archive and interactive collection checklist for **VANNER** photocards. Built with React, TypeScript, Tailwind CSS, and Vite.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ✨ Features
 
-## React Compiler
+- **Interactive Collection Tracking**: Mark cards as **HAVE (✅)** or **WANT (❤️)** with real-time progress calculation. States are automatically persisted via `localStorage`.
+- **Mobile-Optimized UX**:
+  - Direct on-card touch targets for rapid toggling without misclicks.
+  - High-resolution modal lightbox with full metadata display and synchronous status switching.
+- **Multi-Language Support (i18n)**:
+  - Supports **English (EN)**, **繁體中文 (ZH)**, and **한국어 (KO)**.
+  - Automatically detects browser/system language on initial visit with manual override persistence.
+  - Automatic localization mapping for member names and composite unit cards.
+- **One-Click Checklist Export**: Export your filtered card grid into a high-resolution PNG image directly from the browser using `html-to-image`.
+- **Multi-Dimension Filtering**: Filter cards dynamically by Member, Era/Album, and Category, combined with live keyword search across names, IDs, and localized aliases.
+- **Centralized Community Hub**: Integrated contribution links (Google Form) and direct navigation to official channels and member social accounts.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## 🛠 Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Framework**: React 18
+- **Build Tool**: Vite
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React & Custom SVG Assets
+- **Image Processing / Export**: `html-to-image`
+- **Deployment**: GitHub Pages via GitHub Actions
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## 🚀 Getting Started
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Prerequisites
 
-```
+- Node.js (v18 or higher recommended)
+- npm or pnpm
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+### Installation
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+1. Clone the repository:
+   ```bash
+   git clone [https://github.com/vagazinevvs/photocard-archive.git](https://github.com/vagazinevvs/photocard-archive.git)
+   cd photocard-archive
