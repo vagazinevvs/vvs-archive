@@ -24,7 +24,7 @@ import {
 
 const STORAGE_KEY_OWNED = 'vanner_collected_cards';
 const STORAGE_KEY_WANTED = 'vanner_wanted_cards';
-const SUBMISSION_FORM_URL = 'https://docs.google.com/forms/d/e/你的表單ID/viewform';
+const SUBMISSION_FORM_URL = 'https://forms.gle/iTWDSb1ddmCRPBiV7';
 
 interface SocialLinkItem {
   label: string;
