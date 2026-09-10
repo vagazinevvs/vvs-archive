@@ -38,5 +38,21 @@
     "category": "Event",
     "name": "test",
     "imageUrl": "./cards/t1.webp"
+  },
+  {
+    "id": "tt",
+    "era": 1,
+    "member": "Hyesung",
+    "category": "POB",
+    "name": "Phone test",
+    "imageUrl": "./cards/tt.webp"
+  },
+  {
+    "id": "twt",
+    "era": 1,
+    "member": "Hyesung, Sungkook",
+    "category": "Event",
+    "name": "Back",
+    "imageUrl": "./cards/twt.webp"
   }
 ]
