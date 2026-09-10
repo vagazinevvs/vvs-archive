@@ -79,6 +79,22 @@ const SOCIAL_LINKS: SocialLinkItem[] = [
   },
 ];
 
+
+const getMemberBadgeColor = (memberName: string) => {
+  const name = memberName.toLowerCase();
+  if (name.includes('taehwan') || name.includes('泰煥') || name.includes('고태운')) {
+    return 'bg-red-950/70 border-red-800 text-red-300';
+  }
+  if (name.includes('hyesung') || name.includes('慧成') || name.includes('박혜성')) {
+    return 'bg-amber-950/70 border-amber-800 text-amber-300';
+  }
+  if (name.includes('sungkook') || name.includes('成國')) {
+    return 'bg-purple-950/70 border-purple-800 text-purple-300';
+  }
+  // 預設顏色
+  return 'bg-indigo-950/70 border-indigo-800 text-indigo-300';
+};
+
 // Handle local assets and external proxies with CORS fallback
 const formatImageUrl = (url?: string): string => {
   if (!url) return '';
@@ -381,15 +397,40 @@ export default function App() {
               {memberList.map((m) => {
                 const isSelected = selectedMembers.has(m);
                 const label = m === 'All' ? t.all : formatMemberName(m, currentLang);
+                
+                // 取得成員篩選按鈕的專屬色碼
+                const getFilterButtonStyle = (memberKey: string, active: boolean) => {
+                  if (memberKey === 'All') {
+                    return active
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white';
+                  }
+                  const name = memberKey.toLowerCase();
+                  if (name.includes('taehwan') || name.includes('泰煥') || name.includes('고태운')) {
+                    return active
+                      ? 'bg-red-600 text-white shadow-xs shadow-red-600/30'
+                      : 'bg-red-950/40 border border-red-900/60 text-red-300 hover:bg-red-900/50 hover:text-white';
+                  }
+                  if (name.includes('hyesung') || name.includes('慧成') || name.includes('박혜성')) {
+                    return active
+                      ? 'bg-amber-600 text-white shadow-xs shadow-amber-600/30'
+                      : 'bg-amber-950/40 border border-amber-900/60 text-amber-300 hover:bg-amber-900/50 hover:text-white';
+                  }
+                  if (name.includes('sungkook') || name.includes('成國')) {
+                    return active
+                      ? 'bg-purple-600 text-white shadow-xs shadow-purple-600/30'
+                      : 'bg-purple-950/40 border border-purple-900/60 text-purple-300 hover:bg-purple-900/50 hover:text-white';
+                  }
+                  return active
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white';
+                };
+
                 return (
                   <button
                     key={m}
                     onClick={() => toggleMember(m)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
-                      isSelected
-                        ? 'bg-indigo-600 text-white shadow-xs'
-                        : 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white'
-                    }`}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${getFilterButtonStyle(m, isSelected)}`}
                   >
                     {label}
                   </button>
@@ -692,20 +733,29 @@ export default function App() {
             </div>
 
             <div className="w-full mt-3.5 text-left">
-              <h3 className="text-sm font-bold text-neutral-100 truncate">{previewCard.name}</h3>
-              <div className="mt-2 flex flex-wrap gap-1.5 text-[11px]">
-                <span className="rounded bg-indigo-950/70 border border-indigo-800 text-indigo-300 px-2 py-0.5 font-semibold">
+              {/* 1. Name stays on top in bold */}
+              <h3 className="text-sm font-bold text-neutral-100 truncate mb-2">{previewCard.name}</h3>
+              
+              {/* 2. Second row with tags: member / era / category */}
+              <div className="flex flex-wrap gap-1.5 text-[11px]">
+                {/* Member */}
+                <span className={`rounded border px-2 py-0.5 font-semibold ${getMemberBadgeColor(previewCard.member)}`}>
                   {formatMultiMemberString(previewCard.member, currentLang)}
                 </span>
+                {/* Era / Event */}
+                {previewCard.era && (
+                  <span className="rounded bg-neutral-800/60 border border-neutral-700/60 text-neutral-400 px-2 py-0.5 font-medium">
+                    {previewCard.era}
+                  </span>
+                )}
+                {/* Category */}
                 {(previewCard.category || (previewCard as any).catagory) && (
                   <span className="rounded bg-neutral-800 border border-neutral-700 text-neutral-300 px-2 py-0.5 font-medium">
                     {previewCard.category || (previewCard as any).catagory}
                   </span>
                 )}
-                <span className="rounded bg-neutral-800/60 border border-neutral-700/60 text-neutral-400 px-2 py-0.5 font-mono">
-                  {previewCard.id}
-                </span>
               </div>
+            
 
               {/* Lightbox Quick Toggle Buttons */}
               <div className="mt-4 pt-3 border-t border-neutral-800 flex gap-2">
