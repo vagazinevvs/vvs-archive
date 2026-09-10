@@ -7,8 +7,7 @@ import type { Photocard } from './types/card';
 const STORAGE_KEY = 'vanner_collected_cards';
 
 // Google Sheet CSV export endpoint
-const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/1DbRvjqBs3Vg1URfjND6zC2GHu6guX8LoTu3VSPZIBWI/export?format=csv';
-
+const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1DbRvjqBs3Vg1URfjND6zC2GHu6guX8LoTu3VSPZIBWI/gviz/tq?tqx=out:csv&sheet=cards';
 // Split delimited member string into clean array
 const parseMembers = (memberStr: string): string[] => {
   if (!memberStr) return [];
