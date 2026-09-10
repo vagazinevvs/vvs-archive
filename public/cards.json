@@ -22,5 +22,21 @@
     "category": "POB",
     "name": "Makestar Round 1",
     "imageUrl": ""
+  },
+  {
+    "id": "hs_test_dk",
+    "era": "",
+    "member": "Hyesung",
+    "category": "",
+    "name": "White test",
+    "imageUrl": "./cards/hs_test_dk.webp"
+  },
+  {
+    "id": "hs_test_dk",
+    "era": "",
+    "member": "Hyesung",
+    "category": "",
+    "name": "Dark test",
+    "imageUrl": "./cards/hs_test_dk.webp"
   }
 ]
