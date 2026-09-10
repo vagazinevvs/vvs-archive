@@ -43,5 +43,55 @@ A fast, responsive web archive and interactive collection checklist for **VANNER
 
 1. Clone the repository:
    ```bash
-   git clone [https://github.com/vagazinevvs/photocard-archive.git](https://github.com/vagazinevvs/photocard-archive.git)
+   git clone https://github.com/vagazinevvs/photocard-archive.git
    cd photocard-archive
+    ```
+
+
+2. Install dependencies:
+
+  ```bash
+  npm install
+  ```
+3. Start the local development server:
+  
+  ```bash
+  npm run dev
+  ```
+
+4. Build for production:
+  
+  ```bash
+  npm run build
+  ```
+
+## 📂 Project Architecture
+
+```text
+photocard-archive/
+├── public/
+│   ├── cards.json         # Master database of photocard metadata
+│   ├── VVS_logo.svg       # Favicon and brand icon
+│   └── cards/             # Locally hosted photocard scans
+├── src/
+│   ├── types/
+│   │   └── card.ts        # Photocard data type interfaces
+│   ├── i18n.ts            # Dictionaries, member name mapping & language detection
+│   ├── App.tsx            # Main application layout, filtering & grid
+│   ├── main.tsx           # React entry point
+│   └── index.css          # Tailwind CSS directives
+├── index.html
+└── vite.config.ts
+```
+
+## 🤝 Contributing
+We welcome photocard scan submissions, missing data reports, and translations!
+
+Submit Photocards: Use the Contribute button located in the footer to submit missing card scans or corrections via our submission form.
+
+Code Contributions: Pull requests for bug fixes and UI performance enhancements are welcome.
+
+## ⚖️ Disclaimer
+Copyright ⓒ 2026 VVS Archive.
+
+All rights to photocard artwork and related media are reserved by VANNER and their respective copyright holders. This project is a non-profit fan archive created for community collection tracking.
