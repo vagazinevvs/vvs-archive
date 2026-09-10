@@ -30,5 +30,21 @@
     "category": "POB",
     "name": "testrun",
     "imageUrl": "./cards/testrun.webp"
+  },
+  {
+    "id": "260510_2pm_sk",
+    "era": "Still With You",
+    "member": "Sungkook",
+    "category": "Event",
+    "name": "0510pm",
+    "imageUrl": "./cards/260510_2pm_sk.webp"
+  },
+  {
+    "id": "260510_2pm_hs",
+    "era": "Still With You",
+    "member": "Hyesung",
+    "category": "Event",
+    "name": "0510pm",
+    "imageUrl": "./cards/260510_2pm_hs.webp"
   }
 ]
