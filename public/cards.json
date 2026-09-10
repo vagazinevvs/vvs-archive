@@ -30,5 +30,13 @@
     "category": "Event",
     "name": "test",
     "imageUrl": "./cards/test-1.webp"
+  },
+  {
+    "id": "t1",
+    "era": "testing",
+    "member": "Hyesung",
+    "category": "Event",
+    "name": "test",
+    "imageUrl": "./cards/t1.webp"
   }
 ]
