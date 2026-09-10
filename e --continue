@@ -1,0 +1,39 @@
+[33mcommit c5c48aad7d4ab7b26c6b06891de8fd96d097a08d[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author:     ynancy22 <104461821+ynancy22@users.noreply.github.com>
+AuthorDate: Wed Sep 9 21:08:10 2026 -0500
+Commit:     ynancy22 <104461821+ynancy22@users.noreply.github.com>
+CommitDate: Wed Sep 9 21:09:11 2026 -0500
+
+    feat: update VVS Archive UI, dark mode, mobile controls, and social links
+
+[33mcommit 2c1392591f4061e1555db295497d67bd91538bee[m
+Author:     github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+AuthorDate: Thu Sep 10 00:51:55 2026 +0000
+Commit:     github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+CommitDate: Thu Sep 10 00:51:55 2026 +0000
+
+    Auto-process approved cards [skip ci]
+
+[33mcommit 527034ca2e6a8b4fb5c2341e0dba541ce5cb9b2c[m
+Author:     github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+AuthorDate: Thu Sep 10 00:36:53 2026 +0000
+Commit:     github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+CommitDate: Thu Sep 10 00:36:53 2026 +0000
+
+    Auto-process approved cards [skip ci]
+
+[33mcommit 1bf51b4b989d6049cec1647822b7ea0e3f5633a7[m
+Author:     ynancy22 <104461821+ynancy22@users.noreply.github.com>
+AuthorDate: Wed Sep 9 19:33:17 2026 -0500
+Commit:     ynancy22 <104461821+ynancy22@users.noreply.github.com>
+CommitDate: Wed Sep 9 19:36:22 2026 -0500
+
+    fix(pipeline): support photo column alias and duplicate fallback mapping
+
+[33mcommit 0273491e75cc51f964b74d88435b1f16b0f30b90[m
+Author:     github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+AuthorDate: Thu Sep 10 00:07:27 2026 +0000
+Commit:     github-actions[bot] <github-actions[bot]@users.noreply.github.com>
+CommitDate: Thu Sep 10 00:07:27 2026 +0000
+
+    Auto-process approved cards [skip ci]
