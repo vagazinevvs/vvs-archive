@@ -289,9 +289,12 @@ def main():
 
         card_id = str(row.get("id", "")).strip()
         name = str(row.get("name", "")).strip()
-        raw_url = str(row.get("imageUrl", "")).strip()
+        # 1. 彈性抓取圖片連結欄位 (支援 photo, imageUrl, image, url 等欄位名稱，忽略大小寫與空格)
+        url_key = next((k for k in row.keys() if k.strip().lower() in ["photo", "imageurl", "image", "url", "image_url"]), None)
+        raw_url = str(row.get(url_key, "")).strip() if url_key else ""
 
-        if not card_id or not name:
+        if not card_id or not name or not raw_url:
+            print(f"Skipping row {row_idx}: missing id, name, or photo url.")
             continue
 
         target_webp = os.path.join(CARDS_DIR, f"{card_id}.webp")
@@ -309,13 +312,15 @@ def main():
             print(f"Error processing {card_id}: {e}")
             continue
 
+        # 2. 回寫時同時對齊 imageUrl 與 photo，確保 cards 分頁無論用哪個欄位名都能拿到本地路徑
         row_dict = dict(row)
         row_dict["imageUrl"] = local_url
+        row_dict["photo"] = local_url
         aligned_row = [str(row_dict.get(h, "")) for h in cards_headers]
         rows_to_append.append(aligned_row)
 
         cells_to_update.append(gspread.Cell(row=row_idx, col=status_col_idx, value="archived"))
-
+        
     if rows_to_append:
         cards_ws.append_rows(rows_to_append, value_input_option="USER_ENTERED")
         submit_ws.update_cells(cells_to_update)
