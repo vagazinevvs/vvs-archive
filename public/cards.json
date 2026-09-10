@@ -22,37 +22,5 @@
     "category": "POB",
     "name": "Makestar Round 1",
     "imageUrl": ""
-  },
-  {
-    "id": "test-1",
-    "era": "testing",
-    "member": "Hyesung",
-    "category": "Event",
-    "name": "test",
-    "imageUrl": "./cards/test-1.webp"
-  },
-  {
-    "id": "t1",
-    "era": "testing",
-    "member": "Hyesung",
-    "category": "Event",
-    "name": "test",
-    "imageUrl": "./cards/t1.webp"
-  },
-  {
-    "id": "tt",
-    "era": 1,
-    "member": "Hyesung",
-    "category": "POB",
-    "name": "Phone test",
-    "imageUrl": "./cards/tt.webp"
-  },
-  {
-    "id": "twt",
-    "era": 1,
-    "member": "Hyesung, Sungkook",
-    "category": "Event",
-    "name": "Back",
-    "imageUrl": "./cards/twt.webp"
   }
 ]
