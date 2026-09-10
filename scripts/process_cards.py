@@ -35,151 +35,113 @@ def download_image(url: str) -> np.ndarray:
     return cv2.imdecode(image_arr, cv2.IMREAD_COLOR)
 
 
-def auto_detect_and_crop(img: np.ndarray) -> np.ndarray:
-    """Detect card contour against solid/dark background and crop tightly."""
-    h, w = img.shape[:2]
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-    # Sample corners to determine background luminosity
-    corner_samples = [
-        int(gray[10, 10]),
-        int(gray[10, w - 11]),
-        int(gray[h - 11, 10]),
-        int(gray[h - 11, w - 11]),
-    ]
-    bg_val = np.median(corner_samples)
-
-    # Segment card from solid background
-    if bg_val < 40:  # Dark / Black background
-        _, thresh = cv2.threshold(gray, int(bg_val + 25), 255, cv2.THRESH_BINARY)
-    elif bg_val > 215:  # White background
-        _, thresh = cv2.threshold(gray, int(bg_val - 25), 255, cv2.THRESH_BINARY_INV)
-    else:  # Fallback to Otsu thresholding
-        _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-
-    # Fill internal dark regions (hair, ties, shadows) using morphological closing
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (25, 25))
-    mask = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    img_area = w * h
-
-    card_box = None
-    for cnt in sorted(contours, key=cv2.contourArea, reverse=True)[:3]:
-        area = cv2.contourArea(cnt)
-        if area > (img_area * 0.20):
-            bx, by, bw, bh = cv2.boundingRect(cnt)
-            aspect = bw / float(bh)
-            if 0.45 <= aspect <= 0.85:
-                card_box = (bx, by, bw, bh)
-                break
-
-    # If photocard bounding box identified, crop it
-    if card_box:
-        bx, by, bw, bh = card_box
-        # Add 2px margin inward to strip residual background bleeding
-        bx = min(bx + 2, w)
-        by = min(by + 2, h)
-        bw = max(bw - 4, 1)
-        bh = max(bh - 4, 1)
-        return img[by:by + bh, bx:bx + bw]
-
-    # Proportional center-crop fallback
-    current_ratio = w / h
-    if current_ratio > TARGET_RATIO:
-        new_w = int(h * TARGET_RATIO)
-        start_x = (w - new_w) // 2
-        return img[:, start_x:start_x + new_w]
-    else:
-        new_h = int(w / TARGET_RATIO)
-        start_y = (h - new_h) // 2
-        return img[start_y:start_y + new_h, :]
-
 def order_points(pts: np.ndarray) -> np.ndarray:
     """Sort 4 corner points in order: top-left, top-right, bottom-right, bottom-left."""
     rect = np.zeros((4, 2), dtype="float32")
-    
-    # Top-left has smallest sum, bottom-right has largest sum
+
     s = pts.sum(axis=1)
     rect[0] = pts[np.argmin(s)]
     rect[2] = pts[np.argmax(s)]
 
-    # Top-right has smallest diff (x - y or y - x), bottom-left has largest diff
-    diff = np.diff(pts, axis=1)
-    rect[1] = pts[np.argmin(diff)]
-    rect[3] = pts[np.argmax(diff)]
-
-    return rect
-def order_points(pts: np.ndarray) -> np.ndarray:
-    """Sort 4 corner points in order: top-left, top-right, bottom-right, bottom-left."""
-    rect = np.zeros((4, 2), dtype="float32")
-    
-    # Top-left has smallest sum, bottom-right has largest sum
-    s = pts.sum(axis=1)
-    rect[0] = pts[np.argmin(s)]
-    rect[2] = pts[np.argmax(s)]
-
-    # Top-right has smallest diff (x - y or y - x), bottom-left has largest diff
     diff = np.diff(pts, axis=1)
     rect[1] = pts[np.argmin(diff)]
     rect[3] = pts[np.argmax(diff)]
 
     return rect
 
+def auto_detect_and_crop(img: np.ndarray, debug_mask_path: str = None) -> np.ndarray:
+    """Robustly isolate photocard across textured/plain backgrounds with debug logging."""
+    orig_h, orig_w = img.shape[:2]
+    img_area_orig = float(orig_w * orig_h)
 
-def auto_detect_and_crop(img: np.ndarray) -> np.ndarray:
-    """Detect skewed card contour, correct perspective distortion, and warp to straight frame."""
-    h, w = img.shape[:2]
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # 1. Downscale to working resolution (max 800px)
+    max_dim = 800.0
+    scale = max_dim / max(orig_h, orig_w)
+    work_w = int(orig_w * scale)
+    work_h = int(orig_h * scale)
+    small = cv2.resize(img, (work_w, work_h), interpolation=cv2.INTER_AREA)
 
-    # 1. Background segmentation
-    corner_samples = [
-        int(gray[10, 10]),
-        int(gray[10, w - 11]),
-        int(gray[h - 11, 10]),
-        int(gray[h - 11, w - 11]),
+    # 2. Median blur to flatten background textures (leather grain, paper noise)
+    denoised = cv2.medianBlur(small, 7)
+
+    # 3. Sample outer border perimeter to estimate background color in LAB
+    border_th = max(5, int(min(work_w, work_h) * 0.03))
+    borders = [
+        denoised[0:border_th, :],
+        denoised[-border_th:, :],
+        denoised[:, 0:border_th],
+        denoised[:, -border_th:],
     ]
-    bg_val = np.median(corner_samples)
+    border_pixels = np.concatenate([b.reshape(-1, 3) for b in borders], axis=0)
+    bg_bgr = np.median(border_pixels, axis=0).astype(np.uint8)
 
-    if bg_val < 40:
-        _, thresh = cv2.threshold(gray, int(bg_val + 25), 255, cv2.THRESH_BINARY)
-    elif bg_val > 215:
-        _, thresh = cv2.threshold(gray, int(bg_val - 25), 255, cv2.THRESH_BINARY_INV)
-    else:
-        _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    lab = cv2.cvtColor(denoised, cv2.COLOR_BGR2LAB).astype(np.float32)
+    bg_lab = cv2.cvtColor(np.uint8([[bg_bgr]]), cv2.COLOR_BGR2LAB).astype(np.float32)[0, 0]
 
-    # 2. Morphological closing to seal internal regions
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (25, 25))
-    mask = cv2.morphologyEx(thresh, cv2.MORPH_CLOSE, kernel)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    # Calculate Euclidean distance against background
+    delta_e = np.linalg.norm(lab - bg_lab, axis=2)
+    delta_e_norm = cv2.normalize(delta_e, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
 
-    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    img_area = w * h
+    # 4. Otsu adaptive binarization
+    _, mask = cv2.threshold(delta_e_norm, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
+    # 5. Fill all inner card holes (hair, face, shine, clothes)
+    close_k = cv2.getStructuringElement(cv2.MORPH_RECT, (15, 15))
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, close_k)
+
+    cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    solid_mask = np.zeros_like(mask)
+    work_area = float(work_w * work_h)
+
+    for c in cnts:
+        if cv2.contourArea(c) > (work_area * 0.05):
+            cv2.drawContours(solid_mask, [c], -1, 255, thickness=cv2.FILLED)
+
+    if debug_mask_path:
+        cv2.imwrite(debug_mask_path, solid_mask)
+
+    # 6. Extract candidate photocard contour
+    cand_cnts, _ = cv2.findContours(solid_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     target_cnt = None
-    for cnt in sorted(contours, key=cv2.contourArea, reverse=True)[:3]:
+    best_area = 0.0
+
+    for cnt in cand_cnts:
         area = cv2.contourArea(cnt)
-        if area > (img_area * 0.20):
-            target_cnt = cnt
-            break
+        if (work_area * 0.10) < area < (work_area * 0.95):
+            rect = cv2.minAreaRect(cnt)
+            rw, rh = rect[1]
+            if rw == 0 or rh == 0:
+                continue
 
-    # 3. Perspective correction via 4-point transform
+            aspect = min(rw, rh) / float(max(rw, rh))
+            # Photocard aspect ratio is roughly 55:85 (~0.647)
+            if 0.45 <= aspect <= 0.85:
+                if area > best_area:
+                    best_area = area
+                    target_cnt = cnt
+
+    # 7. Perspective transform and gentle outward padding
     if target_cnt is not None:
-        # Approximate contour to polygon
-        peri = cv2.arcLength(target_cnt, True)
-        approx = cv2.approxPolyDP(target_cnt, 0.03 * peri, True)
+        rect = cv2.minAreaRect(target_cnt)
+        quad_pts = cv2.boxPoints(rect).astype("float32")
 
-        # If clean 4-corner polygon found, use it; otherwise fallback to minAreaRect
-        if len(approx) == 4:
-            pts = approx.reshape(4, 2).astype("float32")
-        else:
-            rect = cv2.minAreaRect(target_cnt)
-            pts = cv2.boxPoints(rect).astype("float32")
+        # Map back to full-resolution coordinates
+        pts_orig = quad_pts / scale
+        ordered_pts = order_points(pts_orig)
 
-        ordered_pts = order_points(pts)
+        # Force vertical portrait alignment
+        edge_w = np.linalg.norm(ordered_pts[0] - ordered_pts[1])
+        edge_h = np.linalg.norm(ordered_pts[0] - ordered_pts[3])
+        if edge_w > edge_h:
+            ordered_pts = np.roll(ordered_pts, 1, axis=0)
 
-        # Define destination canvas coordinates (600x927)
+        # Add 2.5% outward padding to prevent clipping edges or hair
+        center = np.mean(ordered_pts, axis=0)
+        ordered_pts = center + (ordered_pts - center) * 1.025
+
+        ordered_pts[:, 0] = np.clip(ordered_pts[:, 0], 0, orig_w - 1)
+        ordered_pts[:, 1] = np.clip(ordered_pts[:, 1], 0, orig_h - 1)
+
         dst_pts = np.array(
             [
                 [0, 0],
@@ -190,20 +152,20 @@ def auto_detect_and_crop(img: np.ndarray) -> np.ndarray:
             dtype="float32",
         )
 
-        # Compute homography matrix and warp
         matrix = cv2.getPerspectiveTransform(ordered_pts, dst_pts)
         warped = cv2.warpPerspective(img, matrix, (TARGET_WIDTH, TARGET_HEIGHT))
+        print(f"[SUCCESS] Photocard detected! Area coverage: {(best_area / work_area) * 100:.1f}%")
         return warped
 
-    # Fallback: Center crop if contour detection fails
-    current_ratio = w / h
+    print("[WARN] Card contour not found. Applied proportional center fallback.")
+    current_ratio = orig_w / orig_h
     if current_ratio > TARGET_RATIO:
-        new_w = int(h * TARGET_RATIO)
-        start_x = (w - new_w) // 2
+        new_w = int(orig_h * TARGET_RATIO)
+        start_x = (orig_w - new_w) // 2
         cropped = img[:, start_x:start_x + new_w]
     else:
-        new_h = int(w / TARGET_RATIO)
-        start_y = (h - new_h) // 2
+        new_h = int(orig_w / TARGET_RATIO)
+        start_y = (orig_h - new_h) // 2
         cropped = img[start_y:start_y + new_h, :]
 
     return cv2.resize(cropped, (TARGET_WIDTH, TARGET_HEIGHT), interpolation=cv2.INTER_LANCZOS4)
@@ -226,17 +188,17 @@ def apply_white_balance(img: np.ndarray) -> np.ndarray:
     return cv2.merge([b, g, r])
 
 
-def add_watermark(pil_img: Image.Image, text: str = "VVS ARCHIVE") -> Image.Image:
+def add_watermark(pil_img: Image.Image, text: str = "VANNER ARCHIVE") -> Image.Image:
     """Apply a repeating 45-degree diagonal watermark across the entire image."""
     base = pil_img.convert("RGBA")
     w, h = base.size
 
-    # Create an oversized canvas to cover rotation without black/empty borders
+    # Oversized canvas to prevent edge cutoffs during rotation
     diag = int(np.sqrt(w**2 + h**2)) + 150
     watermark_layer = Image.new("RGBA", (diag, diag), (255, 255, 255, 0))
     draw = ImageDraw.Draw(watermark_layer)
 
-    font_size = 25
+    font_size = 18
     try:
         font = ImageFont.truetype("arial.ttf", font_size)
     except IOError:
@@ -245,49 +207,40 @@ def add_watermark(pil_img: Image.Image, text: str = "VVS ARCHIVE") -> Image.Imag
         except IOError:
             font = ImageFont.load_default()
 
-    # Calculate text dimensions
     bbox = draw.textbbox((0, 0), text, font=font)
     text_w = bbox[2] - bbox[0]
     text_h = bbox[3] - bbox[1]
 
-    # Tile step intervals
     spacing_x = text_w + 70
     spacing_y = text_h + 55
-
-    # Low opacity white text (alpha=50) to protect cards without obscuring face
     text_color = (255, 255, 255, 50)
 
-    # Tile pattern with staggered offset
+    # Tile watermark pattern
     for row_idx, y in enumerate(range(0, diag, spacing_y)):
         row_offset = (spacing_x // 2) if (row_idx % 2 == 1) else 0
         for x in range(-spacing_x, diag + spacing_x, spacing_x):
             draw.text((x + row_offset, y), text, font=font, fill=text_color)
 
-    # Rotate 45 degrees around center
     rotated = watermark_layer.rotate(45, resample=Image.BICUBIC)
 
-    # Crop center back to original image dimensions
+    # Crop back to match target dimensions
     center_x, center_y = diag // 2, diag // 2
     left = center_x - (w // 2)
     top = center_y - (h // 2)
     cropped_watermark = rotated.crop((left, top, left + w, top + h))
 
-    # Composite watermark onto base image
     watermarked = Image.alpha_composite(base, cropped_watermark)
     return watermarked.convert("RGB")
 
+
 def process_image(img: np.ndarray, output_path: str):
     """Run pipeline stages: Deskew/Crop -> White Balance -> Watermark -> WebP."""
-    # 1. Perspective correction, crop, and resize in one step
     straightened = auto_detect_and_crop(img)
-
-    # 2. Correct white balance on the straightened card
     wb_img = apply_white_balance(straightened)
 
-    # 3. Add watermark and export to WebP
     rgb_img = cv2.cvtColor(wb_img, cv2.COLOR_BGR2RGB)
     pil_img = Image.fromarray(rgb_img)
-    watermarked_img = add_watermark(pil_img, text="VVS ARCHIVE")
+    watermarked_img = add_watermark(pil_img, text="VANNER ARCHIVE")
     watermarked_img.save(output_path, "WEBP", quality=85, method=6)
 
 
@@ -304,31 +257,33 @@ def main():
     creds = Credentials.from_service_account_info(json.loads(sa_json), scopes=scopes)
     gc = gspread.authorize(creds)
     sh = gc.open_by_key(sheet_id)
+
     submit_ws = sh.worksheet("submit")
     cards_ws = sh.worksheet("cards")
 
-    # 取得 submit 分頁的所有資料（含標題列）
     all_rows = submit_ws.get_all_values()
     if len(all_rows) <= 1:
         print("No records found in 'submit' sheet.")
+        all_cards = cards_ws.get_all_records()
+        with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
+            json.dump(all_cards, f, ensure_ascii=False, indent=2)
         return
 
     headers = all_rows[0]
     try:
-        status_col_idx = headers.index("status") + 1  # 轉為 1-based 索引
+        status_col_idx = headers.index("status") + 1
     except ValueError:
         raise ValueError("Cannot find 'status' column in 'submit' sheet.")
 
+    os.makedirs(CARDS_DIR, exist_ok=True)
     cards_headers = cards_ws.row_values(1)
     rows_to_append = []
     cells_to_update = []
 
-    # 遍歷資料列（從第 2 列開始，row_idx 為 1-based）
     for row_idx, row_values in enumerate(all_rows[1:], start=2):
         row = dict(zip(headers, row_values))
         status = str(row.get("status", "")).strip().lower()
 
-        # 只處理狀態為 "process" 的列
         if status != "process":
             continue
 
@@ -348,26 +303,29 @@ def main():
             if img is not None:
                 process_image(img, target_webp)
             else:
+                print(f"Failed to decode image buffer for {card_id}")
                 continue
         except Exception as e:
             print(f"Error processing {card_id}: {e}")
             continue
 
-        # 組裝寫入 cards 分頁的資料
         row_dict = dict(row)
         row_dict["imageUrl"] = local_url
         aligned_row = [str(row_dict.get(h, "")) for h in cards_headers]
         rows_to_append.append(aligned_row)
 
-        # 標記需要將 status 更新為 archived 的儲存格
         cells_to_update.append(gspread.Cell(row=row_idx, col=status_col_idx, value="archived"))
 
-    # 批次寫入 cards 分頁
     if rows_to_append:
         cards_ws.append_rows(rows_to_append, value_input_option="USER_ENTERED")
-        # 批次將 submit 對應列改為 archived
         submit_ws.update_cells(cells_to_update)
         print(f"Appended {len(rows_to_append)} rows to 'cards' and updated status to 'archived'.")
+
+    all_cards = cards_ws.get_all_records()
+    with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
+        json.dump(all_cards, f, ensure_ascii=False, indent=2)
+
+    print("Pipeline completed successfully.")
 
 
 if __name__ == "__main__":
