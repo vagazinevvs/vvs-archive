@@ -1,42 +1,26 @@
 [
   {
-    "id": "jp-th-01",
-    "era": "test1",
+    "id": "",
+    "era": "",
     "member": "Taehwan",
-    "category": "Album",
-    "name": "JACKPOT Regular Ver.",
-    "imageUrl": "https://pbs.twimg.com/media/EG9kA1wWwAAYeTz.jpg?name=small"
+    "category": "",
+    "name": "",
+    "imageUrl": "https://scontent-ord5-2.cdninstagram.com/v/t51.82787-15/800642817_17906516310546764_2906209271769132025_n.jpg?stp=dst-jpg_e35_tt6&_nc_cat=100&ig_cache_key=Mzk4MjI2MTc1OTMzODk5NzU2Nw%3D%3D.3-ccb7-5&ccb=7-5&_nc_sid=58cdad&efg=eyJ2ZW5jb2RlX3RhZyI6IkNBUk9VU0VMX0lURU0ueHBpZHMuMTI4MC5zZHIucmVndWxhcl9waG90by5DMyJ9&_nc_ohc=bsEXSW37GMAQ7kNvwEqkd8I&_nc_oc=AdpA39Wx3Hkc55J8BTej5PMgh8ZWzprZ03kiiGnf8zPhX_-BCYZEsbo2H1Gqg8_QWEqepOv5_T-IPqPH_mcTmYFF&_nc_ad=z-m&_nc_cid=1087&_nc_zt=23&_nc_ht=scontent-ord5-2.cdninstagram.com&_nc_gid=2O4AY6gDqOCan8kOe3eJyg&_nc_ss=7a22e&oh=00_AQLlhQMmaKqDWh9JXDotF4j8itTVEp9oPuKkQXz0DfoXGQ&oe=6AA7DDBC"
   },
   {
-    "id": "jp-gon-01",
-    "era": "test2",
-    "member": "Hyesung, Sungkook",
-    "category": "Album",
-    "name": "JACKPOT Regular Ver.",
-    "imageUrl": "https://pbs.twimg.com/media/EIIpBGFXkAEQBga.jpg?name=small"
-  },
-  {
-    "id": "vvv-hs-pob1",
+    "id": "",
     "era": "",
     "member": "Hyesung",
-    "category": "POB",
-    "name": "Makestar Round 1",
-    "imageUrl": ""
+    "category": "",
+    "name": "",
+    "imageUrl": "https://i.namu.wiki/i/yN9W2sdLd51VpI5QBeIL3vypQV43mV1OjORa8qCniy6XT-_YFBIsmE1COidXprd4jqMUpXSqCB0nC1id2A31ssjB1CeigyEevKxDAw7QZS1SgFFIxyeEiatLzQxIA5MKfQFhpbDu_cecsxc4qTLTEkzDz2tFTSGxUzAGOBluj7I.webp"
   },
   {
-    "id": "hs_test_wt",
+    "id": "",
     "era": "",
-    "member": "Hyesung",
-    "category": "Album",
-    "name": "White test",
-    "imageUrl": "./cards/hs_test_wt.webp"
-  },
-  {
-    "id": "hs_test_dk",
-    "era": "",
-    "member": "Hyesung",
-    "category": "Album",
-    "name": "Dark test",
-    "imageUrl": "./cards/hs_test_dk.webp"
+    "member": "Sungkook",
+    "category": "",
+    "name": "",
+    "imageUrl": "https://i.namu.wiki/i/yN9W2sdLd51VpI5QBeIL3k9nTEDQnfHKS81ti_Rc7pABLB0WQY68dKm6ohB2z6beuvRWCQXlRaXrG3wfiREafF2_eTbf9F8LZ5quuz9L7IdTXar9vwnlVkGK7iyjxQVfntW87WdmogwSybfBrj3_Ew-KuANZ-pfMkLKd3Sqzj7s.webp"
   }
 ]
