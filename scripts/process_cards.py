@@ -304,23 +304,34 @@ def main():
     creds = Credentials.from_service_account_info(json.loads(sa_json), scopes=scopes)
     gc = gspread.authorize(creds)
     sh = gc.open_by_key(sheet_id)
-
-    process_ws = sh.worksheet("process")
+    submit_ws = sh.worksheet("submit")
     cards_ws = sh.worksheet("cards")
 
-    pending_records = process_ws.get_all_records()
-    if not pending_records:
-        print("No pending cards in 'process' tab.")
-        all_cards = cards_ws.get_all_records()
-        with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
-            json.dump(all_cards, f, ensure_ascii=False, indent=2)
+    # 取得 submit 分頁的所有資料（含標題列）
+    all_rows = submit_ws.get_all_values()
+    if len(all_rows) <= 1:
+        print("No records found in 'submit' sheet.")
         return
 
-    os.makedirs(CARDS_DIR, exist_ok=True)
+    headers = all_rows[0]
+    try:
+        status_col_idx = headers.index("status") + 1  # 轉為 1-based 索引
+    except ValueError:
+        raise ValueError("Cannot find 'status' column in 'submit' sheet.")
+
     cards_headers = cards_ws.row_values(1)
     rows_to_append = []
+    cells_to_update = []
 
-    for row in pending_records:
+    # 遍歷資料列（從第 2 列開始，row_idx 為 1-based）
+    for row_idx, row_values in enumerate(all_rows[1:], start=2):
+        row = dict(zip(headers, row_values))
+        status = str(row.get("status", "")).strip().lower()
+
+        # 只處理狀態為 "process" 的列
+        if status != "process":
+            continue
+
         card_id = str(row.get("id", "")).strip()
         name = str(row.get("name", "")).strip()
         raw_url = str(row.get("imageUrl", "")).strip()
@@ -337,30 +348,26 @@ def main():
             if img is not None:
                 process_image(img, target_webp)
             else:
-                print(f"Failed to decode image buffer for {card_id}")
                 continue
         except Exception as e:
             print(f"Error processing {card_id}: {e}")
             continue
 
+        # 組裝寫入 cards 分頁的資料
         row_dict = dict(row)
-        row_dict["id"] = card_id
-        row_dict["name"] = name
         row_dict["imageUrl"] = local_url
-
         aligned_row = [str(row_dict.get(h, "")) for h in cards_headers]
         rows_to_append.append(aligned_row)
 
+        # 標記需要將 status 更新為 archived 的儲存格
+        cells_to_update.append(gspread.Cell(row=row_idx, col=status_col_idx, value="archived"))
+
+    # 批次寫入 cards 分頁
     if rows_to_append:
         cards_ws.append_rows(rows_to_append, value_input_option="USER_ENTERED")
-        process_ws.batch_clear(["A2:Z"])
-        print(f"Appended {len(rows_to_append)} rows to 'cards' and cleared 'process'.")
-
-    all_cards = cards_ws.get_all_records()
-    with open(OUTPUT_JSON, "w", encoding="utf-8") as f:
-        json.dump(all_cards, f, ensure_ascii=False, indent=2)
-
-    print("Pipeline completed successfully.")
+        # 批次將 submit 對應列改為 archived
+        submit_ws.update_cells(cells_to_update)
+        print(f"Appended {len(rows_to_append)} rows to 'cards' and updated status to 'archived'.")
 
 
 if __name__ == "__main__":
