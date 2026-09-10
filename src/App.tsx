@@ -6,8 +6,8 @@ import type { Photocard } from './types/card';
 
 const STORAGE_KEY = 'vanner_collected_cards';
 
-// Paste your published Google Sheet CSV URL here
-const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/1DbRvjqBs3Vg1URfjND6zC2GHu6guX8LoTu3VSPZIBWI/pub?output=csv';
+// Google Sheet CSV export endpoint
+const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/1DbRvjqBs3Vg1URfjND6zC2GHu6guX8LoTu3VSPZIBWI/export?format=csv';
 
 // Split delimited member string into clean array
 const parseMembers = (memberStr: string): string[] => {
@@ -18,16 +18,23 @@ const parseMembers = (memberStr: string): string[] => {
     .filter(Boolean);
 };
 
-// Convert Google Drive links to direct image stream & bypass CORS
+// Route Drive and external images through proxy to bypass CORS and Referrer blocks
 const formatImageUrl = (url: string): string => {
   if (!url) return '';
-  const match = url.match(/(?:id=|\/d\/)([a-zA-Z0-9_-]+)/);
-  if (match && match[1]) {
-    const directUrl = `https://lh3.googleusercontent.com/d/${match[1]}`;
+
+  const matchDrive = url.match(/(?:id=|\/d\/)([a-zA-Z0-9_-]+)/);
+  if (matchDrive && matchDrive[1]) {
+    const directUrl = `https://lh3.googleusercontent.com/d/${matchDrive[1]}`;
     return `https://wsrv.nl/?url=${encodeURIComponent(directUrl)}`;
   }
+
+  if (url.includes('twimg.com') || url.includes('twitter.com')) {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}`;
+  }
+
   return url;
 };
+
 
 export default function App() {
   const [cards, setCards] = useState<Photocard[]>([]);
