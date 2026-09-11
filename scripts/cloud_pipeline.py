@@ -8,12 +8,12 @@ from google.oauth2.service_account import Credentials
 from config import normalize_era, normalize_member
 
 def download_and_process_image(drive_url, save_filename):
-    # 從 Google Drive 連結提取 File ID
+    # 支援 id=... 以及 /file/d/.../view 兩種格式
     match = re.search(r'(?:id=|\/d\/)([a-zA-Z0-9_-]+)', drive_url)
     if not match:
         return None
     file_id = match.group(1)
-    download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    download_url = f"https://lh3.googleusercontent.com/d/{file_id}"
     
     os.makedirs("public/cards", exist_ok=True)
     temp_path = f"temp_{file_id}.png"
@@ -25,7 +25,6 @@ def download_and_process_image(drive_url, save_filename):
                 for chunk in response.iter_content(1024):
                     f.write(chunk)
             
-            # 轉換為 WebP 格式並儲存到 public/cards/
             img = Image.open(temp_path)
             webp_filename = f"{save_filename}.webp"
             webp_path = os.path.join("public/cards", webp_filename)
