@@ -200,30 +200,6 @@
     "imageUrl": "./cards/swy-back.webp"
   },
   {
-    "id": "Still With You-0510 2pm-Sungkook",
-    "era": "Still With You",
-    "member": "Sungkook",
-    "category": "Event",
-    "name": "0510 2pm",
-    "imageUrl": "./cards/Still With You-0510 2pm-Sungkook.webp"
-  },
-  {
-    "id": "Still With You-0510 2pm-Hyesung",
-    "era": "Still With You",
-    "member": "Hyesung",
-    "category": "Event",
-    "name": "0510 2pm",
-    "imageUrl": "./cards/Still With You-0510 2pm-Hyesung.webp"
-  },
-  {
-    "id": "-Phone test-Hyesung",
-    "era": "Unknown",
-    "member": "Hyesung",
-    "category": "POB",
-    "name": "Phone test",
-    "imageUrl": "./cards/-Phone test-Hyesung.webp"
-  },
-  {
     "id": "-Back-Hyesung, Sungkook",
     "era": "Unknown",
     "member": "Hyesung, Sungkook",
@@ -232,19 +208,11 @@
     "imageUrl": "./cards/-Back-Hyesung, Sungkook.webp"
   },
   {
-    "id": "-Dark test-Hyesung",
+    "id": "-White test-Hyesung",
     "era": "Unknown",
     "member": "Hyesung",
     "category": "Album",
-    "name": "Dark test",
-    "imageUrl": "./cards/-Dark test-Hyesung.webp"
-  },
-  {
-    "id": "trial-testrun-Hyesung",
-    "era": "trial",
-    "member": "Hyesung",
-    "category": "POB",
-    "name": "testrun",
-    "imageUrl": "./cards/trial-testrun-Hyesung.webp"
+    "name": "White test",
+    "imageUrl": "./cards/-White test-Hyesung.webp"
   }
 ]
