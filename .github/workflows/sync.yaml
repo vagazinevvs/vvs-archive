@@ -24,6 +24,7 @@ jobs:
 
       - name: Run Sync Pipeline (Merge Staging to cards.json)
         run: |
+        
           python scripts/sync_pipeline.py
 
       - name: Run Cloud Pipeline (Check and update Sheet)
@@ -34,12 +35,14 @@ jobs:
           python scripts/cloud_pipeline.py
           
       - name: Commit and push updated database and assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.io"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
           git add public/
-          git commit -m "chore: sync cloud images and cards database" || true
-          git push origin main --force
-
-
-          
+          git status
+          git commit -m "chore: sync cloud images and cards database" || echo "No changes to commit"
+          git push origin main
