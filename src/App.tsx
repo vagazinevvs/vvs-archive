@@ -20,6 +20,7 @@ import {
   parseMembers,
   formatMemberName,
   formatMultiMemberString,
+  formatEraName,
 } from './i18n';
 
 const STORAGE_KEY_OWNED = 'vanner_collected_cards';
@@ -272,8 +273,7 @@ export default function App() {
         !query ||
         card.name.toLowerCase().includes(query) ||
         card.id.toLowerCase().includes(query) ||
-        card.member.toLowerCase().includes(query) ||
-        localizedMember.includes(query);
+        localizedMember.includes(query); // ✅ 透過 localizedMember 進行搜尋即可
 
       return matchMember && matchEra && matchCat && matchSearch;
     });
@@ -464,7 +464,7 @@ export default function App() {
                         : 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white'
                     }`}
                   >
-                    {e === 'All' ? t.all : e}
+                    {e === 'All' ? t.all : formatEraName(e, currentLang)}
                   </button>
                 ))}
               </div>
@@ -649,7 +649,7 @@ export default function App() {
                   {t.member}: {selectedMembers.has('All') ? t.all : Array.from(selectedMembers).map(m => formatMemberName(m, currentLang)).join(', ')}
                 </span>
                 <span>•</span>
-                <span>{t.era}: {selectedEra === 'All' ? t.all : selectedEra}</span>
+                <span>{t.era}: {selectedEra === 'All' ? t.all : formatEraName(selectedEra, currentLang)}</span>
                 <span>•</span>
                 <span>{t.category}: {selectedCategory === 'All' ? t.all : selectedCategory}</span>
                 {searchQuery && <><span>•</span><span>Keyword: "{searchQuery}"</span></>}
@@ -846,12 +846,12 @@ export default function App() {
               <h3 className="text-sm font-bold text-neutral-100 truncate mb-2">{previewCard.name}</h3>
               
               <div className="flex flex-wrap gap-1.5 text-[11px]">
-                <span className={`rounded border px-2 py-0.5 font-semibold ${getMemberBadgeColor(previewCard.member)}`}>
-                  {formatMultiMemberString(previewCard.member, currentLang)}
-                </span>
+              <span className={`rounded border px-2 py-0.5 font-semibold ${getMemberBadgeColor(formatMultiMemberString(previewCard.member, currentLang))}`}>
+                {formatMultiMemberString(previewCard.member, currentLang)}
+              </span>
                 {previewCard.era && (
                   <span className="rounded bg-neutral-800/60 border border-neutral-700/60 text-neutral-400 px-2 py-0.5 font-medium">
-                    {previewCard.era}
+                    {formatEraName(previewCard.era, currentLang)}
                   </span>
                 )}
                 {(previewCard.category || (previewCard as any).catagory) && (
