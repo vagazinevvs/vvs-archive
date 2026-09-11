@@ -198,29 +198,5 @@
     "category": "Event",
     "name": "back",
     "imageUrl": "./cards/swy-back.webp"
-  },
-  {
-    "id": "th_profile",
-    "era": "Unknown",
-    "member": "Taehwan",
-    "category": "",
-    "name": "th_profile",
-    "imageUrl": "./cards/th_profile.jpg"
-  },
-  {
-    "id": "hs_profile",
-    "era": "Unknown",
-    "member": "Hyesung",
-    "category": "",
-    "name": "hs_profile",
-    "imageUrl": "./cards/hs_profile.webp"
-  },
-  {
-    "id": "sk_profile",
-    "era": "Unknown",
-    "member": "Sungkook",
-    "category": "",
-    "name": "sk_profile",
-    "imageUrl": "./cards/sk_profile.webp"
   }
 ]
