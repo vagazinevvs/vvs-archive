@@ -75,9 +75,9 @@ def process_pipeline():
                 cards_data.append(card_data)
 
                 shutil.move(file_path, os.path.join(DONE_DIR, filename))
-                print(f"   成功處理 {card_id}")
+                print(f"   ✅ {card_id}")
             except Exception as e:
-                print(f"   處理失敗 {filename}: {e}")
+                print(f"   ❌ {filename}: {e}")
 
             
 
