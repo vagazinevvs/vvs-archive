@@ -32,11 +32,11 @@ jobs:
           SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
         run: |
           python scripts/cloud_pipeline.py
-
+          
       - name: Commit and push updated database and assets
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.io"
-          git add .
-          git commit -m "sync permission" || true
+          git add public/
+          git commit -m "chore: sync cloud images and cards database" || true
           git push origin main --force
