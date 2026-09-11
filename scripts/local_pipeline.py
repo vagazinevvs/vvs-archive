@@ -2,7 +2,6 @@ import os
 import json
 from card_process import crop_card, apply_watermark
 
-# 直接輸出到 public/cards.json，讓本機測試與預覽直接對應
 CARDS_JSON_PATH = "public/cards.json"
 LOCAL_RAW_DIR = "raw_incoming"
 LOCAL_OUTPUT_DIR = "public/cards"
@@ -27,7 +26,6 @@ def run_local_pipeline():
         if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
             card_id = os.path.splitext(filename)[0]
             
-            # 防呆：如果 JSON 已經存在該 ID，則跳過
             if card_id in existing_ids:
                 print(f"Skipped (already exists): {filename}")
                 continue
@@ -36,37 +34,38 @@ def run_local_pipeline():
             output_filename = f"{card_id}.webp"
             output_path = os.path.join(LOCAL_OUTPUT_DIR, output_filename)
             
-            # 呼叫核心處理
             cropped = crop_card(raw_path)
             processed_pil = apply_watermark(cropped)
             processed_pil.save(output_path, "WEBP", quality=90)
             
-            # 從檔名解析 era, name, member (格式: era-name-member.jpg)
+            # 從檔名解析 era, name, member (格式: era-name-member1_member2.jpg)
             name_part = card_id
             parts = name_part.split("-")
             
             if len(parts) >= 3:
                 era = parts[0]
                 raw_member = parts[-1]
-                member = [m.strip() for m in raw_member.split("_")]
+                member = [m.strip().lower() for m in raw_member.split("_")]
                 card_name = "-".join(parts[1:-1]).replace("_", " ")
             elif len(parts) == 2:
                 era = parts[0]
                 card_name = parts[1].replace("_", " ")
-                member = "All"
+                member = ["all"]
             else:
                 era = "Unknown"
-                card_name = name_part
-                member = "All"
+                card_name = name_part.replace("_", " ")
+                member = ["all"]
             
-            cards.append({
+            card_data = {
                 "id": card_id,
                 "name": card_name,
                 "member": member,
                 "era": era,
                 "category": "POB",
                 "imageUrl": f"cards/{output_filename}"
-            })
+            }
+            
+            cards.append(card_data)
             print(f"Processed locally: {filename}")
             
     with open(CARDS_JSON_PATH, "w", encoding="utf-8") as f:
