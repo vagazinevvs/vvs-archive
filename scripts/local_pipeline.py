@@ -71,7 +71,7 @@ def process_pipeline():
                 if not local_img_path:
                     raise Exception("Image processing returned None")
                                 
-                card_data = parse_card_metadata(card_id, category=category)
+                card_data = parse_card_metadata(card_id, category="")
                 cards_data.append(card_data)
 
                 shutil.move(file_path, os.path.join(DONE_DIR, filename))
@@ -114,10 +114,10 @@ def process_pipeline():
                 card_data = parse_card_metadata(card_id, category=category)
                 cards_data.append(card_data)
 
-                shutil.move(file_path, os.path.join(DONE_DIR, filename))
-                print(f"   成功處理 {card_id}")
+                #shutil.move(file_path, os.path.join(DONE_DIR, filename))
+                print(f"   ✅ {card_id}")
             except Exception as e:
-                print(f"   處理失敗 {filename}: {e}")
+                print(f"   ❌ {filename}: {e}")
 
     # 寫入暫存檔 cards_staging.json
     json_str = json.dumps(cards_data, cls=CompactEncoder, ensure_ascii=False, indent=2)
