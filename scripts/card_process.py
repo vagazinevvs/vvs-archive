@@ -145,7 +145,7 @@ def process_card_image(input_path, card_id, output_dir="public/cards"):
         standardized_bgr = cv2.resize(balanced_bgr, (800, 1200), interpolation=cv2.INTER_LANCZOS4)
         
         # 加上此行檢查進入浮水印前的尺寸
-        #print(f"DEBUG [{card_id}] Input to watermark shape: {standardized_bgr.shape}")
+        print(f"DEBUG [{card_id}] Input to watermark shape: {standardized_bgr.shape}")
         
         final_pil = apply_watermark(standardized_bgr)
         
