@@ -1,50 +1,112 @@
 [
   {
-    "id": "th_profile",
-    "era": "",
-    "member": "Taehwan",
-    "category": "",
-    "name": "th_profile",
-    "imageUrl": "./cards/th_profile.jpg"
-  },
-  {
-    "id": "hs_profile",
-    "era": "",
-    "member": "Hyesung",
-    "category": "",
-    "name": "hs_profile",
-    "imageUrl": "./cards/hs_profile.webp"
-  },
-  {
-    "id": "sk_profile",
-    "era": "",
-    "member": "Sungkook",
-    "category": "",
-    "name": "sk_profile",
-    "imageUrl": "./cards/sk_profile.webp"
-  },
-  {
-    "id": "testrun",
-    "era": "trial",
-    "member": "Hyesung",
-    "category": "POB",
-    "name": "testrun",
-    "imageUrl": "./cards/testrun.webp"
-  },
-  {
-    "id": "260510_2pm_sk",
-    "era": "Still With You",
-    "member": "Sungkook",
+    "id": "swy-260510_1-hs",
     "category": "Event",
-    "name": "0510 2pm",
-    "imageUrl": "./cards/260510_2pm_sk.webp"
+    "imageUrl": "/cards/swy-260510_1-hs.webp"
   },
   {
-    "id": "260510_2pm_hs",
-    "era": "Still With You",
-    "member": "Hyesung",
+    "id": "swy-260510_1-sk",
     "category": "Event",
-    "name": "0510 2pm",
-    "imageUrl": "./cards/260510_2pm_hs.webp"
+    "imageUrl": "/cards/swy-260510_1-sk.webp"
+  },
+  {
+    "id": "swy-260510_2-hs",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260510_2-hs.webp"
+  },
+  {
+    "id": "swy-260510_2-sk",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260510_2-sk.webp"
+  },
+  {
+    "id": "swy-260530_1-hs",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260530_1-hs.webp"
+  },
+  {
+    "id": "swy-260530_1-sk",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260530_1-sk.webp"
+  },
+  {
+    "id": "swy-260530_2-hs",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260530_2-hs.webp"
+  },
+  {
+    "id": "swy-260530_2-sk",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260530_2-sk.webp"
+  },
+  {
+    "id": "swy-260712_1-hs",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260712_1-hs.webp"
+  },
+  {
+    "id": "swy-260712_1-sk",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260712_1-sk.webp"
+  },
+  {
+    "id": "swy-260712_2-hs",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260712_2-hs.webp"
+  },
+  {
+    "id": "swy-260712_2-sk",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260712_2-sk.webp"
+  },
+  {
+    "id": "swy-260725_1-hs",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260725_1-hs.webp"
+  },
+  {
+    "id": "swy-260725_1-sk",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260725_1-sk.webp"
+  },
+  {
+    "id": "swy-260725_2-hs",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260725_2-hs.webp"
+  },
+  {
+    "id": "swy-260725_2-sk",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260725_2-sk.webp"
+  },
+  {
+    "id": "swy-260829_1-hs",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260829_1-hs.webp"
+  },
+  {
+    "id": "swy-260829_1-sk",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260829_1-sk.webp"
+  },
+  {
+    "id": "swy-260829_2-hs",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260829_2-hs.webp"
+  },
+  {
+    "id": "swy-260829_2-sk",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260829_2-sk.webp"
+  },
+  {
+    "id": "swy-260829_back",
+    "category": "Event",
+    "imageUrl": "/cards/swy-260829_back.webp"
+  },
+  {
+    "id": "swy-back",
+    "category": "Event",
+    "imageUrl": "/cards/swy-back.webp"
   }
 ]

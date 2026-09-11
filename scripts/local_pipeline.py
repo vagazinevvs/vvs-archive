@@ -1,76 +1,124 @@
 import os
 import json
-from card_process import crop_card, apply_watermark
+import shutil
+from card_process import crop_card, apply_watermark, apply_white_balance
 
-CARDS_JSON_PATH = "public/cards.json"
-LOCAL_RAW_DIR = "raw_incoming"
+LOCAL_RAW_DIR = "../raw_incoming"
+DONE_DIR = os.path.join(LOCAL_RAW_DIR, "0-done")
 LOCAL_OUTPUT_DIR = "public/cards"
+CARDS_JSON_PATH = "public/cards.json"
+STAGING_JSON_PATH = "public/cards_staging.json"
 
-def run_local_pipeline():
-    os.makedirs(LOCAL_OUTPUT_DIR, exist_ok=True)
-    os.makedirs("public", exist_ok=True)
+VALID_CATEGORIES = ["Event", "Video Call", "Polaroid", "Album", "POB"]
+CATEGORY_MAP = {cat.lower().replace(" ", ""): cat for cat in VALID_CATEGORIES}
+
+def parse_card_metadata(card_id, category=""):
+    """從檔名解析 era, name, member (格式: era-name-member1_member2.jpg)"""
+    parts = card_id.split("-")
     
-    cards = []
-    if os.path.exists(CARDS_JSON_PATH):
-        with open(CARDS_JSON_PATH, "r", encoding="utf-8") as f:
-            cards = json.load(f)
-            
+    if len(parts) >= 3:
+        era = parts[0]
+        raw_member = parts[-1]
+        member = [m.strip().lower() for m in raw_member.split("_")]
+        card_name = "-".join(parts[1:-1]).replace("_", " ")
+    elif len(parts) == 2:
+        era = parts[0]
+        card_name = parts[1].replace("_", " ")
+        member = ["all"]
+    else:
+        era = "Unknown"
+        card_name = card_id.replace("_", " ")
+        member = ["all"]
+        
+    return {
+        "id": card_id,
+        "name": card_name,
+        "member": member,
+        "era": era,
+        "category": category,
+        "imageUrl": f"/cards/{card_id}.webp"
+    }
+
+def process_pipeline():
+    os.makedirs(LOCAL_OUTPUT_DIR, exist_ok=True)
+    os.makedirs(DONE_DIR, exist_ok=True)
+    cards_data = []
+
     if not os.path.exists(LOCAL_RAW_DIR):
-        os.makedirs(LOCAL_RAW_DIR)
-        print(f"Created {LOCAL_RAW_DIR}. Place raw images inside.")
+        print(f"Error: Raw directory not found at {LOCAL_RAW_DIR}")
         return
 
-    existing_ids = {card["id"] for card in cards}
-
+    # 1. 處理根目錄檔案 (category = "")
     for filename in os.listdir(LOCAL_RAW_DIR):
-        if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+        file_path = os.path.join(LOCAL_RAW_DIR, filename)
+        if os.path.isfile(file_path) and filename.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
             card_id = os.path.splitext(filename)[0]
+            print(f"-> 處理根目錄檔案: {filename} -> ID: '{card_id}'")
             
-            if card_id in existing_ids:
-                print(f"Skipped (already exists): {filename}")
-                continue
+            try:
+                cropped_bgr = crop_card(file_path)
+                balanced_bgr = apply_white_balance(cropped_bgr)
+                final_pil = apply_watermark(balanced_bgr)
+                
+                output_path = os.path.join(LOCAL_OUTPUT_DIR, f"{card_id}.webp")
+                final_pil.save(output_path, "WEBP", quality=85)
+                
+                card_data = parse_card_metadata(card_id, category="")
+                cards_data.append(card_data)
+                
+                # 移動原始檔案至 0-done
+                shutil.move(file_path, os.path.join(DONE_DIR, filename))
+                print(f"   成功處理並移至 0-done: {card_id}")
+            except Exception as e:
+                print(f"   處理失敗 {filename}: {e}")
 
-            raw_path = os.path.join(LOCAL_RAW_DIR, filename)
-            output_filename = f"{card_id}.webp"
-            output_path = os.path.join(LOCAL_OUTPUT_DIR, output_filename)
+    # 2. 處理分類子資料夾
+    for folder_name in os.listdir(LOCAL_RAW_DIR):
+        # 略過 0-done 與其他非分類項目
+        if folder_name == "0-done":
+            continue
             
-            cropped = crop_card(raw_path)
-            processed_pil = apply_watermark(cropped)
-            processed_pil.save(output_path, "WEBP", quality=90)
+        cat_path = os.path.join(LOCAL_RAW_DIR, folder_name)
+        if not os.path.isdir(cat_path):
+            continue
             
-            # 從檔名解析 era, name, member (格式: era-name-member1_member2.jpg)
-            name_part = card_id
-            parts = name_part.split("-")
+        normalized_key = folder_name.lower().replace(" ", "")
+        if normalized_key not in CATEGORY_MAP:
+            print(f"[WARN] 略過未知資料夾 '{folder_name}'")
+            continue
             
-            if len(parts) >= 3:
-                era = parts[0]
-                raw_member = parts[-1]
-                member = [m.strip().lower() for m in raw_member.split("_")]
-                card_name = "-".join(parts[1:-1]).replace("_", " ")
-            elif len(parts) == 2:
-                era = parts[0]
-                card_name = parts[1].replace("_", " ")
-                member = ["all"]
-            else:
-                era = "Unknown"
-                card_name = name_part.replace("_", " ")
-                member = ["all"]
+        category = CATEGORY_MAP[normalized_key]
+        print(f"-> 處理分類: {category} (來源資料夾: {folder_name})")
+        
+        for filename in os.listdir(cat_path):
+            if not filename.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
+                continue
+                
+            file_path = os.path.join(cat_path, filename)
+            card_id = os.path.splitext(filename)[0]
+            print(f"   讀取檔案: {filename} -> ID: '{card_id}'")
             
-            card_data = {
-                "id": card_id,
-                "name": card_name,
-                "member": member,
-                "era": era,
-                "category": "POB",
-                "imageUrl": f"cards/{output_filename}"
-            }
-            
-            cards.append(card_data)
-            print(f"Processed locally: {filename}")
-            
-    with open(CARDS_JSON_PATH, "w", encoding="utf-8") as f:
-        json.dump(cards, f, ensure_ascii=False, indent=2)
-    print(f"Local pipeline completed. {CARDS_JSON_PATH} updated successfully.")
+            try:
+                cropped_bgr = crop_card(file_path)
+                balanced_bgr = apply_white_balance(cropped_bgr)
+                final_pil = apply_watermark(balanced_bgr)
+                
+                output_path = os.path.join(LOCAL_OUTPUT_DIR, f"{card_id}.webp")
+                final_pil.save(output_path, "WEBP", quality=85)
+                
+                card_data = parse_card_metadata(card_id, category=category)
+                cards_data.append(card_data)
+                
+                # 移動原始檔案至 0-done
+                shutil.move(file_path, os.path.join(DONE_DIR, filename))
+                print(f"   成功處理並移至 0-done: {card_id}")
+            except Exception as e:
+                print(f"   處理失敗 {filename}: {e}")
+
+    # 寫入暫存檔
+    with open(STAGING_JSON_PATH, "w", encoding="utf-8") as f:
+        json.dump(cards_data, f, ensure_ascii=False, indent=2)
+    print(f"暫存完成，已寫入 {STAGING_JSON_PATH}")
 
 if __name__ == "__main__":
-    run_local_pipeline()
+    process_pipeline()
