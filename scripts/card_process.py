@@ -141,6 +141,20 @@ def apply_watermark(bgr_image, watermark_text="VVS ARCHIVE", output_height=1200)
             
     return Image.alpha_composite(base_img, watermark_layer).convert("RGB")
 
+def process_card_image(input_path, card_id, output_dir="public/cards"):
+    try:
+        cropped_bgr = crop_card(input_path)
+        balanced_bgr = apply_white_balance(cropped_bgr)
+        final_pil = apply_watermark(balanced_bgr)
+        
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, f"{card_id}.webp")
+        final_pil.save(output_path, "WEBP", quality=85)
+        return f"./cards/{card_id}.webp"
+    except Exception as e:
+        print(f"Error processing card image {card_id}: {e}")
+        return None
+
 def debug_crop_card(image_path, debug_dir="debug_output"):
     """暫時的 Debug 函式：輸出邊緣檢測與輪廓抓取的中間過程圖片"""
     os.makedirs(debug_dir, exist_ok=True)

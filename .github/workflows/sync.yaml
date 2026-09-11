@@ -40,3 +40,6 @@ jobs:
           git add public/
           git commit -m "chore: sync cloud images and cards database" || true
           git push origin main --force
+
+
+          

@@ -1,44 +1,52 @@
 import os
 import json
 import re
+import sys
 import requests
 from PIL import Image
 import gspread
 from google.oauth2.service_account import Credentials
 from config import normalize_era, normalize_member
+from card_process import process_card_image
+
 
 def download_and_process_image(drive_url, save_filename):
-    # 從 Google Drive 連結提取 File ID
+    # 支援 id=... 以及 /file/d/.../view 兩種格式
     match = re.search(r'(?:id=|\/d\/)([a-zA-Z0-9_-]+)', drive_url)
     if not match:
+        print(f"[DEBUG] URL match failed for: {drive_url}")
         return None
+        
     file_id = match.group(1)
-    download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    download_url = f"https://lh3.googleusercontent.com/d/{file_id}"
+    print(f"[DEBUG] Extracted File ID: {file_id}, Target URL: {download_url}")
     
     os.makedirs("public/cards", exist_ok=True)
     temp_path = f"temp_{file_id}.png"
     
     try:
         response = requests.get(download_url, stream=True)
+        print(f"[DEBUG] Response Status Code: {response.status_code}")
+        
         if response.status_code == 200:
             with open(temp_path, 'wb') as f:
                 for chunk in response.iter_content(1024):
                     f.write(chunk)
             
-            # 轉換為 WebP 格式並儲存到 public/cards/
-            img = Image.open(temp_path)
-            webp_filename = f"{save_filename}.webp"
-            webp_path = os.path.join("public/cards", webp_filename)
-            img.save(webp_path, "WEBP", quality=85)
+            # 透過共用模組進行裁切、白平衡與浮水印處理
+            local_img_path = process_card_image(temp_path, save_filename)
             
             if os.path.exists(temp_path):
                 os.remove(temp_path)
                 
-            return f"./cards/{webp_filename}"
+            return local_img_path
+        else:
+            print(f"[DEBUG] Failed with status code {response.status_code}")
     except Exception as e:
-        print(f"Failed to process image from Drive: {e}")
+        print(f"[DEBUG] Exception caught while processing image: {e}")
         if os.path.exists(temp_path):
             os.remove(temp_path)
+            
     return None
 
 def run_cloud_pipeline():
@@ -80,9 +88,9 @@ def run_cloud_pipeline():
                         print(f"Card ID '{card_id}' already exists. Marked row {idx} as 'rejected'.")
                 else:
                     drive_url = str(row.get("photo", ""))
-                    # 處理圖片下載與 WebP 轉換
+                    # 下載圖片並套用共用處理管線
                     local_img_path = download_and_process_image(drive_url, card_id)
-                    
+
                     if local_img_path:
                         normalized_era = normalize_era(str(row.get("era", "")))
                         normalized_member = normalize_member(str(row.get("member", "")))

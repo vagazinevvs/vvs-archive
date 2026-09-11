@@ -2,7 +2,7 @@ import os
 import json
 import shutil
 import re
-from card_process import crop_card, apply_watermark, apply_white_balance
+from card_process import process_card_image
 
 LOCAL_RAW_DIR = "../raw_incoming"
 DONE_DIR = os.path.join(LOCAL_RAW_DIR, "0-done")
@@ -65,22 +65,21 @@ def process_pipeline():
             card_id = os.path.splitext(filename)[0]
             #print(f"-> 處理根目錄檔案: {filename} -> ID: '{card_id}'")
             
+            
             try:
-                cropped_bgr = crop_card(file_path)
-                balanced_bgr = apply_white_balance(cropped_bgr)
-                final_pil = apply_watermark(balanced_bgr)
-                
-                output_path = os.path.join(LOCAL_OUTPUT_DIR, f"{card_id}.webp")
-                final_pil.save(output_path, "WEBP", quality=85)
-                
-                card_data = parse_card_metadata(card_id, category="")
+                local_img_path = process_card_image(file_path, card_id)
+                if not local_img_path:
+                    raise Exception("Image processing returned None")
+                                
+                card_data = parse_card_metadata(card_id, category=category)
                 cards_data.append(card_data)
-                
-                # 移動原始檔案至 0-done
-                #shutil.move(file_path, os.path.join(DONE_DIR, filename))
+
+                shutil.move(file_path, os.path.join(DONE_DIR, filename))
                 print(f"   成功處理 {card_id}")
             except Exception as e:
                 print(f"   處理失敗 {filename}: {e}")
+
+            
 
     # 2. 處理分類子資料夾
     for folder_name in os.listdir(LOCAL_RAW_DIR):
@@ -106,38 +105,32 @@ def process_pipeline():
                 
             file_path = os.path.join(cat_path, filename)
             card_id = os.path.splitext(filename)[0]
-            #print(f"   讀取檔案: {filename} -> ID: '{card_id}'")
-            
+
             try:
-                cropped_bgr = crop_card(file_path)
-                balanced_bgr = apply_white_balance(cropped_bgr)
-                final_pil = apply_watermark(balanced_bgr)
-                
-                output_path = os.path.join(LOCAL_OUTPUT_DIR, f"{card_id}.webp")
-                final_pil.save(output_path, "WEBP", quality=85)
-                
+                local_img_path = process_card_image(file_path, card_id)
+                if not local_img_path:
+                    raise Exception("Image processing returned None")
+                                
                 card_data = parse_card_metadata(card_id, category=category)
                 cards_data.append(card_data)
-                
-                # 移動原始檔案至 0-done
-                #shutil.move(file_path, os.path.join(DONE_DIR, filename))
+
+                shutil.move(file_path, os.path.join(DONE_DIR, filename))
                 print(f"   成功處理 {card_id}")
             except Exception as e:
                 print(f"   處理失敗 {filename}: {e}")
 
-    # 寫入暫存檔
-    json_str = json.dumps(final_cards, ensure_ascii=False, indent=2)
+    # 寫入暫存檔 cards_staging.json
+    json_str = json.dumps(cards_data, cls=CompactEncoder, ensure_ascii=False, indent=2)
     json_str = re.sub(
         r'"member": \s*\[\s*("[^"]+")\s*\]', 
         r'"member": [\1]', 
         json_str
     )
 
-    with open(PROD_JSON_PATH, "w", encoding="utf-8") as f:
+    with open(STAGING_JSON_PATH, "w", encoding="utf-8") as f:
         f.write(json_str)
 
-    os.remove(STAGING_JSON_PATH)
-    print(f"同步完成，已更新 {PROD_JSON_PATH}（新增 {added_count} 張）")
+    print(f"本地處理完成，已輸出至 {STAGING_JSON_PATH}（共處理 {len(cards_data)} 張）")
 
 if __name__ == "__main__":
     process_pipeline()
