@@ -111,9 +111,10 @@ def apply_watermark(bgr_image, watermark_text="VVS ARCHIVE"):
     base_img = Image.fromarray(rgb).convert("RGBA")
     watermark_layer = Image.new("RGBA", (output_width, output_height), (0, 0, 0, 0))
     
-    font_size = max(40, int(output_height * 0.1))
+    font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DejaVuSans-Bold.ttf")
+    font_size = max(30, int(output_height * 0.01))
     try:
-        font = ImageFont.truetype("DejaVuSans-Bold.ttf", font_size)
+        font = ImageFont.truetype(font_path, font_size)
     except IOError:
         font = ImageFont.load_default()
     
@@ -124,8 +125,8 @@ def apply_watermark(bgr_image, watermark_text="VVS ARCHIVE"):
     padding, stamp_w, stamp_h = 20, text_w + 40, text_h + 40
     stamp = Image.new("RGBA", (stamp_w, stamp_h), (0, 0, 0, 0))
     stamp_draw = ImageDraw.Draw(stamp)
-    stamp_draw.text((padding + 1, padding + 1), watermark_text, fill=(0, 0, 0, 200), font=font)
-    stamp_draw.text((padding, padding), watermark_text, fill=(255, 255, 255, 200), font=font)
+    stamp_draw.text((padding + 1, padding + 1), watermark_text, fill=(0, 0, 0, 50), font=font)
+    stamp_draw.text((padding, padding), watermark_text, fill=(255, 255, 255,50), font=font)
     
     rotated_stamp = stamp.rotate(45, resample=Image.BICUBIC, expand=True)
     rw, rh = rotated_stamp.size
@@ -142,6 +143,10 @@ def process_card_image(input_path, card_id, output_dir="public/cards"):
         cropped_bgr = crop_card(input_path)
         balanced_bgr = apply_white_balance(cropped_bgr)
         standardized_bgr = cv2.resize(balanced_bgr, (800, 1200), interpolation=cv2.INTER_LANCZOS4)
+        
+        # 加上此行檢查進入浮水印前的尺寸
+        #print(f"DEBUG [{card_id}] Input to watermark shape: {standardized_bgr.shape}")
+        
         final_pil = apply_watermark(standardized_bgr)
         
         os.makedirs(output_dir, exist_ok=True)
