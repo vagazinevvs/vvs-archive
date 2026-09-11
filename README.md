@@ -48,8 +48,6 @@ A fast, responsive web archive and interactive collection checklist for **VANNER
    git clone https://github.com/vagazinevvs/photocard-archive.git
    cd photocard-archive
     ```
-
-
 2. Install dependencies:
 
   ```bash
@@ -85,6 +83,26 @@ photocard-archive/
 ├── index.html
 └── vite.config.ts
 ```
+
+```mermaid
+graph TD
+    subgraph Local [本機端：離線處理]
+        A[原始圖片 raw_incoming] -->|執行 local_pipeline.py| B[裁切 & 產出 .webp]
+        B --> C[更新本機 public/cards.json]
+        C -->|git push| D[推送到 GitHub 倉庫]
+    end
+
+    subgraph Cloud [雲端與資料同步：GitHub Actions]
+        D --> E[觸發 deploy.yml]
+        E -->|執行 cloud_pipeline.py| F{Google Sheets 智慧同步}
+        F -->|檢查 submit 表 status: process| G[寫入主 cards 工作表]
+        F -->|比對並補登本機 cards.json 缺漏| G
+        G --> H[從 cards 工作表撈取完整資料]
+        H --> I[覆蓋更新 public/cards.json]
+        I --> J[執行 npm run build & 部署至 GitHub Pages]
+    end
+```
+
 
 ## 🤝 Contributing
 We welcome photocard scan submissions, missing data reports, and translations!
