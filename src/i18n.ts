@@ -19,6 +19,31 @@ export const getInitialLanguage = (): Language => {
   }
 };
 
+
+// 1. 在對應的語言字典或獨立物件中加入 era 的翻譯
+export const ERA_TRANSLATIONS: Record<Language, Record<string, string>> = {
+  en: {
+    swy: "Still With You",
+    caf: "Caffeine",
+  },
+  zh: {
+    swy: "Still With You",
+    caf: "咖啡因",
+  },
+  ko: {
+    swy: "Still With You",
+    caf: "카페인",
+  },
+};
+
+// 2. 建立格式化 Era 的函式
+export const formatEraName = (eraKey: string, lang: Language): string => {
+  if (!eraKey) return '';
+  const lowerKey = eraKey.toLowerCase();
+  return ERA_TRANSLATIONS[lang]?.[lowerKey] || eraKey;
+};
+
+
 // 介面文字字典
 export const I18N = {
   en: {
