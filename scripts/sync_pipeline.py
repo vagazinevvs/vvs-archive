@@ -1,5 +1,6 @@
 import os
 import json
+import re
 from config import ERA_MAPPING, MEMBER_MAPPING
 
 PROD_JSON_PATH = "public/cards.json"
@@ -47,11 +48,18 @@ def merge_staging_to_prod():
             print(f"略過重複 ID: {card_id}")
 
     final_cards = list(prod_map.values())
+    json_str = json.dumps(final_cards, ensure_ascii=False, indent=2)
+    json_str = re.sub(
+        r'"member": \s*\[\s*("[^"]+")\s*\]', 
+        r'"member": [\1]', 
+        json_str
+    )
+
     with open(PROD_JSON_PATH, "w", encoding="utf-8") as f:
-        json.dump(final_cards, f, ensure_ascii=False, indent=2)
+        f.write(json_str)
 
     os.remove(STAGING_JSON_PATH)
-    print(f"同步完成，已成功加入 {added_count} 張新卡片至 {PROD_JSON_PATH}")
+    print(f"同步完成，已更新 {PROD_JSON_PATH}（新增 {added_count} 張）")
 
 if __name__ == "__main__":
     merge_staging_to_prod()

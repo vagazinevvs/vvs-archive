@@ -1,112 +1,26 @@
 [
   {
-    "id": "swy-260510_1-hs",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260510_1-hs.webp"
+    "id": "profile_th",
+    "era": "",
+    "member": "Taehwan",
+    "category": "",
+    "name": "profile_th",
+    "imageUrl": "./cards/profile_th.jpg"
   },
   {
-    "id": "swy-260510_1-sk",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260510_1-sk.webp"
+    "id": "profile_hs",
+    "era": "",
+    "member": "Hyesung",
+    "category": "",
+    "name": "profile_hs",
+    "imageUrl": "./cards/profile_hs.webp"
   },
   {
-    "id": "swy-260510_2-hs",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260510_2-hs.webp"
-  },
-  {
-    "id": "swy-260510_2-sk",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260510_2-sk.webp"
-  },
-  {
-    "id": "swy-260530_1-hs",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260530_1-hs.webp"
-  },
-  {
-    "id": "swy-260530_1-sk",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260530_1-sk.webp"
-  },
-  {
-    "id": "swy-260530_2-hs",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260530_2-hs.webp"
-  },
-  {
-    "id": "swy-260530_2-sk",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260530_2-sk.webp"
-  },
-  {
-    "id": "swy-260712_1-hs",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260712_1-hs.webp"
-  },
-  {
-    "id": "swy-260712_1-sk",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260712_1-sk.webp"
-  },
-  {
-    "id": "swy-260712_2-hs",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260712_2-hs.webp"
-  },
-  {
-    "id": "swy-260712_2-sk",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260712_2-sk.webp"
-  },
-  {
-    "id": "swy-260725_1-hs",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260725_1-hs.webp"
-  },
-  {
-    "id": "swy-260725_1-sk",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260725_1-sk.webp"
-  },
-  {
-    "id": "swy-260725_2-hs",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260725_2-hs.webp"
-  },
-  {
-    "id": "swy-260725_2-sk",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260725_2-sk.webp"
-  },
-  {
-    "id": "swy-260829_1-hs",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260829_1-hs.webp"
-  },
-  {
-    "id": "swy-260829_1-sk",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260829_1-sk.webp"
-  },
-  {
-    "id": "swy-260829_2-hs",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260829_2-hs.webp"
-  },
-  {
-    "id": "swy-260829_2-sk",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260829_2-sk.webp"
-  },
-  {
-    "id": "swy-260829_back",
-    "category": "Event",
-    "imageUrl": "/cards/swy-260829_back.webp"
-  },
-  {
-    "id": "swy-back",
-    "category": "Event",
-    "imageUrl": "/cards/swy-back.webp"
+    "id": "profile_sk",
+    "era": "",
+    "member": "Sungkook",
+    "category": "",
+    "name": "profile_sk",
+    "imageUrl": "./cards/profile_sk.webp"
   }
-]
+  ]
