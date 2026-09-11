@@ -1,8 +1,45 @@
 import os
 import json
+import re
+import requests
+from PIL import Image
 import gspread
 from google.oauth2.service_account import Credentials
 from config import normalize_era, normalize_member
+
+def download_and_process_image(drive_url, save_filename):
+    # 從 Google Drive 連結提取 File ID
+    match = re.search(r'(?:id=|\/d\/)([a-zA-Z0-9_-]+)', drive_url)
+    if not match:
+        return None
+    file_id = match.group(1)
+    download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    
+    os.makedirs("public/cards", exist_ok=True)
+    temp_path = f"temp_{file_id}.png"
+    
+    try:
+        response = requests.get(download_url, stream=True)
+        if response.status_code == 200:
+            with open(temp_path, 'wb') as f:
+                for chunk in response.iter_content(1024):
+                    f.write(chunk)
+            
+            # 轉換為 WebP 格式並儲存到 public/cards/
+            img = Image.open(temp_path)
+            webp_filename = f"{save_filename}.webp"
+            webp_path = os.path.join("public/cards", webp_filename)
+            img.save(webp_path, "WEBP", quality=85)
+            
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+                
+            return f"./cards/{webp_filename}"
+    except Exception as e:
+        print(f"Failed to process image from Drive: {e}")
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
+    return None
 
 def run_cloud_pipeline():
     sa_key = os.environ.get("GCP_SA_KEY")
@@ -23,7 +60,6 @@ def run_cloud_pipeline():
     cards_records = cards_sheet.get_all_records()
     existing_ids = {str(row.get("id")) for row in cards_records}
     
-    # 1. 檢查 submit 工作表中狀態為 "process" 的項目
     try:
         submit_sheet = spreadsheet.worksheet("submit")
         submit_records = submit_sheet.get_all_records()
@@ -37,74 +73,48 @@ def run_cloud_pipeline():
             card_id = str(row.get("id", ""))
             
             if status == "process" and card_id:
-                # 防呆機制：如果該 ID 已經存在 cards 工作表中，則將狀態改為 rejected
+                # 防呆：若 ID 已存在 cards，改為 rejected
                 if card_id in existing_ids:
                     if status_col_idx:
                         submit_sheet.update_cell(idx, status_col_idx, "rejected")
-                        print(f"Card ID '{card_id}' already exists in cards sheet. Marked submit row {idx} as 'rejected'.")
+                        print(f"Card ID '{card_id}' already exists. Marked row {idx} as 'rejected'.")
                 else:
-                    normalized_era = normalize_era(str(row.get("era", "")))
-                    normalized_member = normalize_member(str(row.get("member", "")))
+                    drive_url = str(row.get("imageUrl", ""))
+                    # 處理圖片下載與 WebP 轉換
+                    local_img_path = download_and_process_image(drive_url, card_id)
                     
-                    new_rows_from_submit.append([
-                        row.get("id"),
-                        normalized_era,
-                        normalized_member,
-                        row.get("category"),
-                        row.get("name"),
-                        row.get("imageUrl")
-                    ])
-                    existing_ids.add(card_id)
-                    
-                    # 更新該筆 submit 記錄的狀態為 done
-                    if status_col_idx:
-                        submit_sheet.update_cell(idx, status_col_idx, "done")
+                    if local_img_path:
+                        normalized_era = normalize_era(str(row.get("era", "")))
+                        normalized_member = normalize_member(str(row.get("member", "")))
+                        
+                        new_rows_from_submit.append([
+                            card_id,
+                            normalized_era,
+                            normalized_member,
+                            row.get("category"),
+                            row.get("name"),
+                            local_img_path
+                        ])
+                        existing_ids.add(card_id)
+                        
+                        if status_col_idx:
+                            submit_sheet.update_cell(idx, status_col_idx, "archived")
+                        print(f"Successfully processed and archived card ID: {card_id}")
+                    else:
+                        print(f"Failed to fetch image for card ID: {card_id}")
                 
         if new_rows_from_submit:
             cards_sheet.append_rows(new_rows_from_submit)
-            print(f"Added {len(new_rows_from_submit)} cards from submit sheet and updated statuses.")
+            
     except Exception as e:
-        print(f"Notice: 'submit' sheet check skipped or failed ({e}).")
+        print(f"Notice: 'submit' sheet processing failed ({e}).")
 
-    # 2. 讀取本機推上來的 public/cards.json，將雲端試算表缺少的本地卡片自動補登回 Google Sheets
-    local_cards_path = "public/cards.json"
-    if os.path.exists(local_cards_path):
-        try:
-            with open(local_cards_path, "r", encoding="utf-8") as f:
-                local_cards = json.load(f)
-            
-            cards_records = cards_sheet.get_all_records()
-            existing_ids = {str(row.get("id")) for row in cards_records}
-            
-            new_rows_from_local = []
-            for card in local_cards:
-                card_id = str(card.get("id", ""))
-                if card_id and card_id not in existing_ids:
-                    normalized_era = normalize_era(str(card.get("era", "")))
-                    normalized_member = normalize_member(str(card.get("member", "")))
-                    
-                    new_rows_from_local.append([
-                        card.get("id"),
-                        normalized_era,
-                        normalized_member,
-                        card.get("category"),
-                        card.get("name"),
-                        card.get("imageUrl")
-                    ])
-                    existing_ids.add(card_id)
-                    
-            if new_rows_from_local:
-                cards_sheet.append_rows(new_rows_from_local)
-                print(f"Synced {len(new_rows_from_local)} offline-processed local cards to Google Sheets cards worksheet.")
-        except Exception as e:
-            print(f"Notice: Failed to merge local cards.json into sheet: {e}")
-
-    # 3. 從 cards 工作表撈取最終完整資料，並覆蓋更新 public/cards.json 供前端打包部署
+    # 輸出最終 cards.json
     final_records = cards_sheet.get_all_records()
     os.makedirs("public", exist_ok=True)
     with open("public/cards.json", "w", encoding="utf-8") as f:
         json.dump(final_records, f, ensure_ascii=False, indent=2)
-    print("Cloud pipeline updated public/cards.json successfully with merged records.")
+    print("Cloud pipeline updated public/cards.json successfully.")
 
 if __name__ == "__main__":
     run_cloud_pipeline()
