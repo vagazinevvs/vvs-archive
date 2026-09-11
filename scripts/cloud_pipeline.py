@@ -23,37 +23,42 @@ def run_cloud_pipeline():
     cards_records = cards_sheet.get_all_records()
     existing_ids = {str(row.get("id")) for row in cards_records}
     
-    # 1. 檢查 submit 工作表中狀態為 "process" 的項目並寫入 cards 工作表，完成後更新狀態為 done
+    # 1. 檢查 submit 工作表中狀態為 "process" 的項目
     try:
         submit_sheet = spreadsheet.worksheet("submit")
         submit_records = submit_sheet.get_all_records()
         new_rows_from_submit = []
         
-        # 取得 submit 表的 header 與 status 欄位索引 (1-based)
         submit_headers = submit_sheet.row_values(1)
         status_col_idx = submit_headers.index("status") + 1 if "status" in submit_headers else None
 
-        for idx, row in enumerate(submit_records, start=2): # start=2 因為從第二列開始是資料
+        for idx, row in enumerate(submit_records, start=2):
             status = str(row.get("status", "")).strip().lower()
             card_id = str(row.get("id", ""))
             
-            if status == "process" and card_id and card_id not in existing_ids:
-                normalized_era = normalize_era(str(row.get("era", "")))
-                normalized_member = normalize_member(str(row.get("member", "")))
-                
-                new_rows_from_submit.append([
-                    row.get("id"),
-                    normalized_era,
-                    normalized_member,
-                    row.get("category"),
-                    row.get("name"),
-                    row.get("imageUrl")
-                ])
-                existing_ids.add(card_id)
-                
-                # 更新該筆 submit 記錄的狀態為 done
-                if status_col_idx:
-                    submit_sheet.update_cell(idx, status_col_idx, "done")
+            if status == "process" and card_id:
+                # 防呆機制：如果該 ID 已經存在 cards 工作表中，則將狀態改為 rejected
+                if card_id in existing_ids:
+                    if status_col_idx:
+                        submit_sheet.update_cell(idx, status_col_idx, "rejected")
+                        print(f"Card ID '{card_id}' already exists in cards sheet. Marked submit row {idx} as 'rejected'.")
+                else:
+                    normalized_era = normalize_era(str(row.get("era", "")))
+                    normalized_member = normalize_member(str(row.get("member", "")))
+                    
+                    new_rows_from_submit.append([
+                        row.get("id"),
+                        normalized_era,
+                        normalized_member,
+                        row.get("category"),
+                        row.get("name"),
+                        row.get("imageUrl")
+                    ])
+                    existing_ids.add(card_id)
+                    
+                    # 更新該筆 submit 記錄的狀態為 done
+                    if status_col_idx:
+                        submit_sheet.update_cell(idx, status_col_idx, "done")
                 
         if new_rows_from_submit:
             cards_sheet.append_rows(new_rows_from_submit)
