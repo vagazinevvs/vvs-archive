@@ -1,34 +1,26 @@
 [
   {
     "id": "profile_th",
-    "era": "Unknown",
-    "member": "Taehwan",
+    "era": "",
+    "member": ["Taehwan"],
     "category": "",
     "name": "profile_th",
     "imageUrl": "./cards/profile_th.jpg"
   },
   {
     "id": "profile_hs",
-    "era": "Unknown",
-    "member": "Hyesung",
+    "era": "",
+    "member": ["Hyesung"],
     "category": "",
     "name": "profile_hs",
     "imageUrl": "./cards/profile_hs.webp"
   },
   {
     "id": "profile_sk",
-    "era": "Unknown",
-    "member": "Sungkook",
+    "era": "",
+    "member": ["Sungkook"],
     "category": "",
     "name": "profile_sk",
     "imageUrl": "./cards/profile_sk.webp"
-  },
-  {
-    "id": "trial-cloud-Hyesung",
-    "era": "trial",
-    "member": "Hyesung",
-    "category": "POB",
-    "name": "cloud",
-    "imageUrl": "./cards/trial-cloud-Hyesung.webp"
   }
-]
+  ]
