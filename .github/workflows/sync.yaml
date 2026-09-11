@@ -3,6 +3,9 @@ name: Run Sync & Cloud Pipelines
 on:
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   run-pipelines:
     runs-on: ubuntu-latest
