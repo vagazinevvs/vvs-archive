@@ -20,9 +20,11 @@ def normalize_era(era: str) -> str:
     cleaned = era.strip()
     return ERA_MAPPING.get(cleaned.lower(), cleaned)
 
-def normalize_member(member: str) -> str:
-    if not member:
-        return ""
-    parts = [p.strip() for p in member.replace("_", ",").split(",")]
-    normalized_parts = [MEMBER_MAPPING.get(p.lower(), p) for p in parts]
-    return "_".join(normalized_parts)
+def normalize_member(member_input):
+    if isinstance(member_input, list):
+        return ", ".join([str(m).strip() for m in member_input if m])
+    if isinstance(member_input, str):
+        # 移除可能殘留的方括號或引號
+        cleaned = member_input.strip("[]'\"")
+        return ", ".join([m.strip("'\" ") for m in cleaned.split(",") if m.strip("'\" ")])
+    return str(member_input)
