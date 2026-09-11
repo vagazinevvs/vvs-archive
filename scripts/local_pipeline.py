@@ -1,6 +1,7 @@
 import os
 import json
 import shutil
+import re
 from card_process import crop_card, apply_watermark, apply_white_balance
 
 LOCAL_RAW_DIR = "../raw_incoming"
@@ -11,6 +12,15 @@ STAGING_JSON_PATH = "public/cards_staging.json"
 
 VALID_CATEGORIES = ["Event", "Video Call", "Polaroid", "Album", "POB"]
 CATEGORY_MAP = {cat.lower().replace(" ", ""): cat for cat in VALID_CATEGORIES}
+
+
+class CompactEncoder(json.JSONEncoder):
+    """讓 member 陣列維持單行顯示的自訂 Encoder"""
+    def encode(self, o):
+        if isinstance(o, list) and all(isinstance(item, str) for item in o):
+            return json.dumps(o, ensure_ascii=False)
+        return super().encode(o)
+
 
 def parse_card_metadata(card_id, category=""):
     """從檔名解析 era, name, member (格式: era-name-member1_member2.jpg)"""
@@ -45,7 +55,7 @@ def process_pipeline():
     cards_data = []
 
     if not os.path.exists(LOCAL_RAW_DIR):
-        print(f"Error: Raw directory not found at {LOCAL_RAW_DIR}")
+        #print(f"Error: Raw directory not found at {LOCAL_RAW_DIR}")
         return
 
     # 1. 處理根目錄檔案 (category = "")
@@ -53,7 +63,7 @@ def process_pipeline():
         file_path = os.path.join(LOCAL_RAW_DIR, filename)
         if os.path.isfile(file_path) and filename.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
             card_id = os.path.splitext(filename)[0]
-            print(f"-> 處理根目錄檔案: {filename} -> ID: '{card_id}'")
+            #print(f"-> 處理根目錄檔案: {filename} -> ID: '{card_id}'")
             
             try:
                 cropped_bgr = crop_card(file_path)
@@ -67,8 +77,8 @@ def process_pipeline():
                 cards_data.append(card_data)
                 
                 # 移動原始檔案至 0-done
-                shutil.move(file_path, os.path.join(DONE_DIR, filename))
-                print(f"   成功處理並移至 0-done: {card_id}")
+                #shutil.move(file_path, os.path.join(DONE_DIR, filename))
+                print(f"   成功處理 {card_id}")
             except Exception as e:
                 print(f"   處理失敗 {filename}: {e}")
 
@@ -84,7 +94,7 @@ def process_pipeline():
             
         normalized_key = folder_name.lower().replace(" ", "")
         if normalized_key not in CATEGORY_MAP:
-            print(f"[WARN] 略過未知資料夾 '{folder_name}'")
+            #print(f"[WARN] 略過未知資料夾 '{folder_name}'")
             continue
             
         category = CATEGORY_MAP[normalized_key]
@@ -96,7 +106,7 @@ def process_pipeline():
                 
             file_path = os.path.join(cat_path, filename)
             card_id = os.path.splitext(filename)[0]
-            print(f"   讀取檔案: {filename} -> ID: '{card_id}'")
+            #print(f"   讀取檔案: {filename} -> ID: '{card_id}'")
             
             try:
                 cropped_bgr = crop_card(file_path)
@@ -110,15 +120,24 @@ def process_pipeline():
                 cards_data.append(card_data)
                 
                 # 移動原始檔案至 0-done
-                shutil.move(file_path, os.path.join(DONE_DIR, filename))
-                print(f"   成功處理並移至 0-done: {card_id}")
+                #shutil.move(file_path, os.path.join(DONE_DIR, filename))
+                print(f"   成功處理 {card_id}")
             except Exception as e:
                 print(f"   處理失敗 {filename}: {e}")
 
     # 寫入暫存檔
-    with open(STAGING_JSON_PATH, "w", encoding="utf-8") as f:
-        json.dump(cards_data, f, ensure_ascii=False, indent=2)
-    print(f"暫存完成，已寫入 {STAGING_JSON_PATH}")
+    json_str = json.dumps(final_cards, ensure_ascii=False, indent=2)
+    json_str = re.sub(
+        r'"member": \s*\[\s*("[^"]+")\s*\]', 
+        r'"member": [\1]', 
+        json_str
+    )
+
+    with open(PROD_JSON_PATH, "w", encoding="utf-8") as f:
+        f.write(json_str)
+
+    os.remove(STAGING_JSON_PATH)
+    print(f"同步完成，已更新 {PROD_JSON_PATH}（新增 {added_count} 張）")
 
 if __name__ == "__main__":
     process_pipeline()
