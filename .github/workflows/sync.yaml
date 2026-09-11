@@ -1,13 +1,10 @@
-name: Run Sync & Cloud Pipelines
+name: Run Cloud Sheet Pipeline
 
 on:
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  run-pipelines:
+  run-cloud-pipeline:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -20,29 +17,11 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install opencv-python-headless pillow numpy requests gspread google-auth
+          pip install requests gspread google-auth
 
-      - name: Run Sync Pipeline (Merge Staging to cards.json)
-        run: |
-        
-          python scripts/sync_pipeline.py
-
-      - name: Run Cloud Pipeline (Check and update Sheet)
+      - name: Run Cloud Pipeline (Sync to Sheet)
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
           SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
         run: |
           python scripts/cloud_pipeline.py
-          
-      - name: Commit and push updated database and assets
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.io"
-          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
-          git status
-          git diff
-          git add public/
-          git commit -m "chore: sync cloud images and cards database"
-          git push origin main
