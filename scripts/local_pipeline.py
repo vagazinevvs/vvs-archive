@@ -46,7 +46,7 @@ def parse_card_metadata(card_id, category=""):
         "member": member,
         "era": era,
         "category": category,
-        "imageUrl": f"/cards/{card_id}.webp"
+        "imageUrl": f"./cards/{card_id}.webp"
     }
 
 def process_pipeline():

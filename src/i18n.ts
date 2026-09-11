@@ -128,12 +128,45 @@ export const MEMBER_NAME_MAP: Record<string, Record<Language, string>> = {
   yeongkwang: { en: 'Yeongkwang', zh: '泳光', ko: '영광' },
   영광: { en: 'Yeongkwang', zh: '泳光', ko: '영광' },
   泳光: { en: 'Yeongkwang', zh: '泳光', ko: '영광' },
+
+  other: { en: 'Other', zh: '其他', ko: '기타' },
+ 
+  
 };
 
-// 分割多人欄位輔助函式
-export const parseMembers = (memberStr: string): string[] => {
-  if (!memberStr) return [];
-  return memberStr
+// // 分割多人欄位輔助函式
+// export const parseMembers = (memberStr: string): string[] => {
+//   if (!memberStr) return [];
+//   return memberStr
+//     .split(/[,/&]+/)
+//     .map((m) => m.trim())
+//     .filter(Boolean);
+// };
+
+// // 格式化單一成員名稱
+// export const formatMemberName = (name: string, lang: Language): string => {
+//   const cleanKey = name.trim().toLowerCase();
+//   if (MEMBER_NAME_MAP[cleanKey]) {
+//     return MEMBER_NAME_MAP[cleanKey][lang];
+//   }
+//   return name;
+// };
+
+// // 格式化複合成員字串（例如 "Hyesung, Sungkook"）
+// export const formatMultiMemberString = (memberStr: string, lang: Language): string => {
+//   if (!memberStr) return '';
+//   const parsed = parseMembers(memberStr);
+//   return parsed.map((m) => formatMemberName(m, lang)).join(', ');
+// };
+
+
+// 分割多人欄位輔助函式（相容字串與陣列）
+export const parseMembers = (memberInput: string | string[]): string[] => {
+  if (!memberInput) return [];
+  if (Array.isArray(memberInput)) {
+    return memberInput.map((m) => String(m).trim()).filter(Boolean);
+  }
+  return memberInput
     .split(/[,/&]+/)
     .map((m) => m.trim())
     .filter(Boolean);
@@ -148,9 +181,9 @@ export const formatMemberName = (name: string, lang: Language): string => {
   return name;
 };
 
-// 格式化複合成員字串（例如 "Hyesung, Sungkook"）
-export const formatMultiMemberString = (memberStr: string, lang: Language): string => {
-  if (!memberStr) return '';
-  const parsed = parseMembers(memberStr);
+// 格式化複合成員字串
+export const formatMultiMemberString = (memberInput: string | string[], lang: Language): string => {
+  if (!memberInput) return '';
+  const parsed = parseMembers(memberInput);
   return parsed.map((m) => formatMemberName(m, lang)).join(', ');
 };

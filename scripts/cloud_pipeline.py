@@ -2,7 +2,7 @@ import os
 import json
 import gspread
 from google.oauth2.service_account import Credentials
-from scripts.config import normalize_era, normalize_member
+from config import normalize_era, normalize_member
 
 def run_cloud_pipeline():
     sa_key = os.environ.get("GCP_SA_KEY")
