@@ -37,5 +37,6 @@ jobs:
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.io"
-          git add public/cards.json public/cards/
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: sync pipelines and update cards database" && git push)
+          git add .
+          git commit -m "sync permission" || true
+          git push origin main --force
