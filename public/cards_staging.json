@@ -174,5 +174,13 @@
     "era": "swy",
     "category": "Event",
     "imageUrl": "./cards/swy-back.webp"
+  },
+  {
+    "id": "trial-local-Hyesung",
+    "name": "local",
+    "member": ["hyesung"],
+    "era": "trial",
+    "category": "Event",
+    "imageUrl": "./cards/trial-local-Hyesung.webp"
   }
 ]

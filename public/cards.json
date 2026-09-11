@@ -1,42 +1,26 @@
 [
   {
     "id": "profile_th",
-    "era": "Unknown",
-    "member": "Taehwan",
+    "era": "",
+    "member": ["Taehwan"],
     "category": "",
     "name": "profile_th",
     "imageUrl": "./cards/profile_th.jpg"
   },
   {
     "id": "profile_hs",
-    "era": "Unknown",
-    "member": "Hyesung",
+    "era": "",
+    "member": ["Hyesung"],
     "category": "",
     "name": "profile_hs",
     "imageUrl": "./cards/profile_hs.webp"
   },
   {
     "id": "profile_sk",
-    "era": "Unknown",
-    "member": "Sungkook",
+    "era": "",
+    "member": ["Sungkook"],
     "category": "",
     "name": "profile_sk",
     "imageUrl": "./cards/profile_sk.webp"
-  },
-  {
-    "id": "trial-testrun-Hyesung",
-    "era": "trial",
-    "member": "Hyesung",
-    "category": "POB",
-    "name": "testrun",
-    "imageUrl": "./cards/trial-testrun-Hyesung.webp"
-  },
-  {
-    "id": "Still With You-test cloud-Sungkook",
-    "era": "Still With You",
-    "member": "Sungkook",
-    "category": "Event",
-    "name": "test cloud",
-    "imageUrl": "./cards/Still With You-test cloud-Sungkook.webp"
   }
-]
+  ]
