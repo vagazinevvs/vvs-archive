@@ -68,6 +68,37 @@ def run_cloud_pipeline():
     cards_records = cards_sheet.get_all_records()
     existing_ids = {str(row.get("id")) for row in cards_records}
     
+# 掃描本地的 public/cards.json，將 Google 試算表上缺少的項目補上去
+    local_cards_path = "public/cards.json"
+    if os.path.exists(local_cards_path):
+        try:
+            with open(local_cards_path, "r", encoding="utf-8") as f:
+                local_cards = json.load(f)
+            
+            new_rows_from_local = []
+            for card in local_cards:
+                card_id = card.get("id")
+                if card_id and card_id not in existing_ids:
+                    raw_members = card.get("member", "")
+                    member_str = ", ".join(raw_members) if isinstance(raw_members, list) else str(raw_members)
+                    
+                    new_rows_from_local.append([
+                        card_id,
+                        card.get("era", ""),
+                        member_str,
+                        card.get("category", ""),
+                        card.get("name", ""),
+                        card.get("imageUrl", "")
+                    ])
+                    existing_ids.add(card_id)
+                    print(f"🆕 Local card ID '{card_id}' missing in sheet, queued for append.")
+            
+            if new_rows_from_local:
+                cards_sheet.append_rows(new_rows_from_local)
+                print(f"Successfully appended {len(new_rows_from_local)} cards from public/cards.json to Google Sheets.")
+        except Exception as e:
+            print(f"Notice: Failed to process public/cards.json ({e}).")
+
     try:
         submit_sheet = spreadsheet.worksheet("submit")
         submit_records = submit_sheet.get_all_records()
