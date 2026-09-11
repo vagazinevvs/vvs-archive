@@ -43,9 +43,9 @@ def merge_staging_to_prod():
             expanded_card = expand_full_names(card)
             prod_map[card_id] = expanded_card
             added_count += 1
-            print(f"新增卡片至正式清單: {card_id}")
+            print(f"🆕 {card_id}")
         else:
-            print(f"略過重複 ID: {card_id}")
+            print(f"⏭️ {card_id}")
 
     final_cards = list(prod_map.values())
     json_str = json.dumps(final_cards, ensure_ascii=False, indent=2)
@@ -58,7 +58,6 @@ def merge_staging_to_prod():
     with open(PROD_JSON_PATH, "w", encoding="utf-8") as f:
         f.write(json_str)
 
-    os.remove(STAGING_JSON_PATH)
     print(f"同步完成，已更新 {PROD_JSON_PATH}（新增 {added_count} 張）")
 
 if __name__ == "__main__":

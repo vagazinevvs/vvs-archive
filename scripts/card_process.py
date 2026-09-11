@@ -145,6 +145,15 @@ def process_card_image(input_path, card_id, output_dir="public/cards"):
     try:
         cropped_bgr = crop_card(input_path)
         balanced_bgr = apply_white_balance(cropped_bgr)
+        
+        # 3. 統一縮放到標準大小（例如固定寬度或長寬，確保後續浮水印比例一致）
+        # 假設這裡將轉為 PIL 進行標準化尺寸調整
+        img_pil = Image.fromarray(cv2.cvtColor(balanced_bgr, cv2.COLOR_BGR2RGB))
+        standard_width = 800  # 請依你的標準卡片寬度調整
+        w_percent = (standard_width / float(img_pil.size[0]))
+        h_size = int(float(img_pil.size[1]) * float(w_percent))
+        resized_pil = img_pil.resize((standard_width, h_size), Image.Resampling.LANCZOS)
+
         final_pil = apply_watermark(balanced_bgr)
         
         os.makedirs(output_dir, exist_ok=True)
