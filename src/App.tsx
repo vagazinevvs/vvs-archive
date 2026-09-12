@@ -634,7 +634,7 @@ export default function App() {
       </main>
 
       {/* 隱藏的 5 欄專屬匯出模板（包含篩選條件、計數器與完美 5 欄網格，供截圖使用） */}
-      <div className="hidden sm:block absolute -z-50 opacity-0 pointer-events-none left-0 top-0 overflow-hidden">
+      <div className="absolute -z-50 opacity-0 pointer-events-none left-0 top-0 overflow-hidden">
         <div
           ref={templateRef}
           className="bg-neutral-900 p-6 rounded-2xl border border-neutral-800 flex flex-col gap-4 w-[1200px]"
