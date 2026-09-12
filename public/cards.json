@@ -238,5 +238,29 @@
     "category": "Snapism",
     "name": "2025 B",
     "imageUrl": "./cards/other-2025 B-Sungkook-16.webp"
+  },
+  {
+    "id": "other-2025 B back-Sungkook-17",
+    "era": "other",
+    "member": "Sungkook",
+    "category": "Snapism",
+    "name": "2025 B back",
+    "imageUrl": "./cards/other-2025 B back-Sungkook-17.webp"
+  },
+  {
+    "id": "other-2026 bday A back-Hyesung-18",
+    "era": "other",
+    "member": "Hyesung",
+    "category": "Snapism",
+    "name": "2026 bday A back",
+    "imageUrl": "./cards/other-2026 bday A back-Hyesung-18.webp"
+  },
+  {
+    "id": "other-2026 bday B back-Sungkook-19",
+    "era": "other",
+    "member": "Sungkook",
+    "category": "Snapism",
+    "name": "2026 bday B back",
+    "imageUrl": "./cards/other-2026 bday B back-Sungkook-19.webp"
   }
 ]
