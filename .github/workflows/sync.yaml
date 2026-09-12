@@ -20,8 +20,8 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install requests gspread google-auth pillow
-
+          pip install requests gspread google-auth pillow opencv-python-headless oauth2client 
+          
       - name: Run Cloud Pipeline (Sync to Sheet)
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
