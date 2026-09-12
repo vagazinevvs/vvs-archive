@@ -15,6 +15,8 @@ def run_cleanup(target_card_id=None, target_member=None):
         json.loads(sa_key), 
         scopes=["https://www.googleapis.com/auth/spreadsheets"]
     )
+
+    print("Using Spreadsheet ID:", spreadsheet_id)
     client = gspread.authorize(creds)
     spreadsheet = client.open_by_key(spreadsheet_id)
     
