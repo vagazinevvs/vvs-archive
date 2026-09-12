@@ -1,4 +1,4 @@
-name: Run Sync & Cloud Pipelines
+name: Run Cloud Sheet Pipeline & Deploy
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ permissions:
   contents: write
 
 jobs:
-  run-pipelines:
+  run-pipeline-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -20,22 +20,27 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install opencv-python-headless pillow numpy requests gspread google-auth
+          pip install requests gspread google-auth pillow
 
-      - name: Run Cloud Pipeline (Check and update Sheet)
+      - name: Run Cloud Pipeline (Sync to Sheet)
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
           SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
         run: |
           python scripts/cloud_pipeline.py
-          
-      - name: Commit and push updated database and assets
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Node dependencies and Build
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.io"
-          git add public/
-          git commit -m "chore: sync cloud images and cards database" || true
-          git push origin main --force
+          npm install
+          npm run build
 
-
-          
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
