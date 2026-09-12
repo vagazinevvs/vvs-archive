@@ -200,22 +200,6 @@
     "imageUrl": "./cards/swy-back.webp"
   },
   {
-    "id": "other-2026 bday-Hyesung-12",
-    "era": "other",
-    "member": "Hyesung",
-    "category": "Snapism",
-    "name": "2026 bday",
-    "imageUrl": "./cards/other-2026 bday-Hyesung-12.webp"
-  },
-  {
-    "id": "other-2026 bday-Hyesung-13",
-    "era": "other",
-    "member": "Hyesung",
-    "category": "Snapism",
-    "name": "2026 bday",
-    "imageUrl": "./cards/other-2026 bday-Hyesung-13.webp"
-  },
-  {
     "id": "other-2026 bday B-Hyesung-12",
     "era": "other",
     "member": "Hyesung",
@@ -254,13 +238,5 @@
     "category": "Snapism",
     "name": "2025 B",
     "imageUrl": "./cards/other-2025 B-Sungkook-16.webp"
-  },
-  {
-    "id": "other-2025 B back-Sungkook-17",
-    "era": "other",
-    "member": "Sungkook",
-    "category": "Snapism",
-    "name": "2025 B back",
-    "imageUrl": "./cards/other-2025 B back-Sungkook-17.webp"
   }
 ]
