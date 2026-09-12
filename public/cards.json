@@ -22,31 +22,7 @@
     "category": "",
     "name": "profile_sk",
     "imageUrl": "./cards/profile_sk.webp"
-  },
-  {
-    "id": "trial-cloud-Hyesung",
-    "era": "trial",
-    "member": "Hyesung",
-    "category": "POB",
-    "name": "cloud",
-    "imageUrl": "./cards/trial-cloud-Hyesung.webp"
-  },
-  {
-    "id": "-Phone test-Hyesung",
-    "era": "Unknown",
-    "member": "Hyesung",
-    "category": "POB",
-    "name": "Phone test",
-    "imageUrl": "./cards/-Phone test-Hyesung.webp"
-  },
-  {
-    "id": "-White test-Hyesung",
-    "era": "Unknown",
-    "member": "Hyesung",
-    "category": "Album",
-    "name": "White test",
-    "imageUrl": "./cards/-White test-Hyesung.webp"
-  },
+  }
   {
     "id": "swy-260510_1-hs",
     "era": "Still With You",
