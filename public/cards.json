@@ -1,7 +1,7 @@
 [
   {
     "id": "profile_th",
-    "era": "",
+    "era": "Unknown",
     "member": "Taehwan",
     "category": "",
     "name": "profile_th",
@@ -9,7 +9,7 @@
   },
   {
     "id": "profile_hs",
-    "era": "",
+    "era": "Unknown",
     "member": "Hyesung",
     "category": "",
     "name": "profile_hs",
@@ -17,7 +17,7 @@
   },
   {
     "id": "profile_sk",
-    "era": "",
+    "era": "Unknown",
     "member": "Sungkook",
     "category": "",
     "name": "profile_sk",
@@ -214,5 +214,53 @@
     "category": "Snapism",
     "name": "2026 bday",
     "imageUrl": "./cards/other-2026 bday-Hyesung-13.webp"
+  },
+  {
+    "id": "other-2026 bday B-Hyesung-12",
+    "era": "other",
+    "member": "Hyesung",
+    "category": "Snapism",
+    "name": "2026 bday B",
+    "imageUrl": "./cards/other-2026 bday B-Hyesung-12.webp"
+  },
+  {
+    "id": "other-2026 bday A-Hyesung-13",
+    "era": "other",
+    "member": "Hyesung",
+    "category": "Snapism",
+    "name": "2026 bday A",
+    "imageUrl": "./cards/other-2026 bday A-Hyesung-13.webp"
+  },
+  {
+    "id": "other-2025 A-Sungkook-14",
+    "era": "other",
+    "member": "Sungkook",
+    "category": "Snapism",
+    "name": "2025 A",
+    "imageUrl": "./cards/other-2025 A-Sungkook-14.webp"
+  },
+  {
+    "id": "other-2025 A back-Sungkook-15",
+    "era": "other",
+    "member": "Sungkook",
+    "category": "Snapism",
+    "name": "2025 A back",
+    "imageUrl": "./cards/other-2025 A back-Sungkook-15.webp"
+  },
+  {
+    "id": "other-2025 B-Sungkook-16",
+    "era": "other",
+    "member": "Sungkook",
+    "category": "Snapism",
+    "name": "2025 B",
+    "imageUrl": "./cards/other-2025 B-Sungkook-16.webp"
+  },
+  {
+    "id": "other-2025 B back-Sungkook-17",
+    "era": "other",
+    "member": "Sungkook",
+    "category": "Snapism",
+    "name": "2025 B back",
+    "imageUrl": "./cards/other-2025 B back-Sungkook-17.webp"
   }
 ]
