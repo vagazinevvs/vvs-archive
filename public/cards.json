@@ -1,7 +1,7 @@
 [
   {
     "id": "profile_th",
-    "era": "",
+    "era": "Unknown",
     "member": "Taehwan",
     "category": "",
     "name": "profile_th",
@@ -9,7 +9,7 @@
   },
   {
     "id": "profile_hs",
-    "era": "",
+    "era": "Unknown",
     "member": "Hyesung",
     "category": "",
     "name": "profile_hs",
@@ -17,7 +17,7 @@
   },
   {
     "id": "profile_sk",
-    "era": "",
+    "era": "Unknown",
     "member": "Sungkook",
     "category": "",
     "name": "profile_sk",
@@ -194,9 +194,25 @@
   {
     "id": "swy-back",
     "era": "Still With You",
-    "member": "" ,
+    "member": "",
     "category": "Event",
     "name": "back",
     "imageUrl": "./cards/swy-back.webp"
+  },
+  {
+    "id": "other-2026 bday-Hyesung-11",
+    "era": "other",
+    "member": "Hyesung",
+    "category": "Snapism",
+    "name": "2026 bday",
+    "imageUrl": "./cards/other-2026 bday-Hyesung-11.webp"
+  },
+  {
+    "id": "other-2026 bday-Hyesung-12",
+    "era": "other",
+    "member": "Hyesung",
+    "category": "Snapism",
+    "name": "2026 bday",
+    "imageUrl": "./cards/other-2026 bday-Hyesung-12.webp"
   }
 ]
