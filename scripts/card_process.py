@@ -29,18 +29,6 @@ def four_point_transform(image, pts):
     m = cv2.getPerspectiveTransform(rect, dst)
     return cv2.warpPerspective(image, m, (max_w, max_h))
 
-def center_crop_fallback(img):
-    h, w = img.shape[:2]
-    current_ratio = w / float(h)
-    if current_ratio > TARGET_ASPECT_RATIO:
-        target_w = int(h * TARGET_ASPECT_RATIO)
-        offset_x = (w - target_w) // 2
-        return img[:, offset_x:offset_x + target_w]
-    else:
-        target_h = int(w / TARGET_ASPECT_RATIO)
-        offset_y = (h - target_h) // 2
-        return img[offset_y:offset_y + target_h, :]
-
 def apply_white_balance(bgr_img):
     h, w = bgr_img.shape[:2]
     corner_h = int(h * 0.12)
@@ -84,7 +72,7 @@ def apply_white_balance(bgr_img):
     
     return np.clip(result, 0, 255).astype(np.uint8)
 
-def crop_card(image_input):
+def crop_card(image_input, debug_dir=None):
     if isinstance(image_input, str):
         img = cv2.imread(image_input)
     else:
@@ -97,41 +85,59 @@ def crop_card(image_input):
     img_area = h * w
     
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
+    filtered = cv2.bilateralFilter(gray, 11, 35, 35)
+    edged = cv2.Canny(filtered, 15, 60)
     
-    _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-    edged = cv2.Canny(blurred, 30, 150)
-    combined = cv2.bitwise_or(thresh, edged)
+    kernel = np.ones((21, 11), np.uint8)
+    closed = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel, iterations=3)
     
-    kernel = np.ones((5, 5), np.uint8)
-    closed = cv2.morphologyEx(combined, cv2.MORPH_CLOSE, kernel, iterations=3)
+    if debug_dir:
+        os.makedirs(debug_dir, exist_ok=True)
+        cv2.imwrite(os.path.join(debug_dir, "diag_filtered.jpg"), filtered)
+        cv2.imwrite(os.path.join(debug_dir, "diag_edged.jpg"), edged)
+        cv2.imwrite(os.path.join(debug_dir, "diag_closed.jpg"), closed)
     
     contours, _ = cv2.findContours(closed.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     card_crop = None
     
     if contours:
-        largest_c = max(contours, key=cv2.contourArea)
-        if cv2.contourArea(largest_c) > (img_area * 0.15):
-            peri = cv2.arcLength(largest_c, True)
-            approx = cv2.approxPolyDP(largest_c, 0.02 * peri, True)
-            
-            if len(approx) == 4:
-                pts = approx.reshape(4, 2).astype("float32")
-            else:
-                rect = cv2.minAreaRect(largest_c)
+        contours = sorted(contours, key=cv2.contourArea, reverse=True)
+        for c in contours:
+            area = cv2.contourArea(c)
+            if area > (img_area * 0.10):
+                hull = cv2.convexHull(c)
+                rect = cv2.minAreaRect(hull)
                 box = cv2.boxPoints(rect)
                 pts = box.astype("float32")
                 
-            warped = four_point_transform(img, pts)
-            crop_h, crop_w = warped.shape[:2]
-            ratio = min(crop_w, crop_h) / max(crop_w, crop_h)
-            
-            if 0.4 <= ratio <= 0.9:
-                card_crop = warped
+                w_box = np.linalg.norm(pts[0] - pts[1])
+                h_box = np.linalg.norm(pts[1] - pts[2])
+                if w_box == 0 or h_box == 0:
+                    continue
+                
+                ratio = min(w_box, h_box) / max(w_box, h_box)
+                
+                if 0.5 <= ratio <= 0.8:
+                    center = np.mean(pts, axis=0)
+                    # 調整為 0.99 以完美貼合實際邊緣
+                    pts = center + (pts - center) * 0.99
+                    
+                    card_crop = four_point_transform(img, pts)
+                    break
 
     if card_crop is None:
-        card_crop = center_crop_fallback(img)
+        target_aspect = 55.0 / 85.0
+        if (w / h) > target_aspect:
+            crop_h = int(h * 0.85)
+            crop_w = int(crop_h * target_aspect)
+        else:
+            crop_w = int(w * 0.85)
+            crop_h = int(crop_w / target_aspect)
+            
+        start_x = (w - crop_w) // 2
+        start_y = (h - crop_h) // 2
+        card_crop = img[start_y:start_y+crop_h, start_x:start_x+crop_w]
         
     if card_crop.shape[1] > card_crop.shape[0]:
         card_crop = cv2.rotate(card_crop, cv2.ROTATE_90_CLOCKWISE)
@@ -176,9 +182,9 @@ def process_card_image(input_path, card_id, output_dir="public/cards"):
     try:
         raw_img = cv2.imread(input_path)
         if raw_img is None:
+        
             raise ValueError(f"Unable to read image at: {input_path}")
         
-        # Flow: White Balance -> Crop -> Contrast/Brightness -> Resize -> Watermark
         balanced_bgr = apply_white_balance(raw_img)
         cropped_bgr = crop_card(balanced_bgr)
         
@@ -187,7 +193,6 @@ def process_card_image(input_path, card_id, output_dir="public/cards"):
         bright_bgr = cv2.convertScaleAbs(cropped_bgr, alpha=alpha, beta=beta)
         
         standardized_bgr = cv2.resize(bright_bgr, (800, 1200), interpolation=cv2.INTER_LANCZOS4)
-        
         final_pil = apply_watermark(standardized_bgr)
         
         os.makedirs(output_dir, exist_ok=True)
@@ -197,4 +202,3 @@ def process_card_image(input_path, card_id, output_dir="public/cards"):
     except Exception as e:
         print(f"Error processing card image {card_id}: {e}")
         return None
-        
