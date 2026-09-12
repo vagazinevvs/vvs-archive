@@ -1,117 +1,25 @@
-# VVS Archive 💎
+# VVS Archive
+[💎VVS Archive](https://vagazinevvs.github.io/vvs-archive/)
+A fan-made web tool for browsing and managing your photocard collection.  
+(粉絲製作的小卡瀏覽與管理網頁工具 / 팬이 제작한 포토카드 브라우징 및 관리 웹 도구)
 
-A fast, responsive web archive and interactive collection checklist for **VANNER** photocards. Built with React, TypeScript, Tailwind CSS, and Vite.
+## How to Use / 使用說明 / 사용 방법
 
-[VVS archive](https://vagazinevvs.github.io/photocard-archive/)
+1. **Browse Collection**: View and search through the catalog of photocards directly from the web interface.  
+   *(瀏覽收藏：直接透過網頁介面檢視與搜尋小卡圖錄。 / 컬렉션 탐색: 웹 인터페이스를 통해 직접 포토카드 카탈로그를 조회하고 검색합니다.)*
+2. **Filter & Sort**: Use the available filters and sorting options to quickly find specific items by member, album, or status.  
+   *(篩選與排序：使用篩選與排序功能，依成員、專輯或狀態快速尋找特定項目。 / 필터 및 정렬: 멤버, 앨범, 상태별로 특정 아이템을 빠르게 찾기 위해 필터 및 정렬 옵션을 사용합니다.)*
+3. **Local Management**: All custom card labeling, notes, and organizational tags are saved locally within your browser environment.  
+   *(本機管理：所有自定義小卡標籤、筆記與整理標籤皆僅儲存於您的瀏覽器本機環境中。 / 로컬 관리: 모든 커스텀 카드 라벨, 메모 및 정리 태그는 브라우저 로컬 환경에만 저장됩니다.)*
 
----
+## Copyright & Disclaimer / 版權聲明與免責聲明 / 저작권 및 면책 조항
 
-## ✨ Features
+This project is an independent, non-commercial archival tool created for personal organization purposes.  
+*(本專案為個人整理用途而建立之獨立、非營利歸檔工具。 / 이 프로젝트는 개인 정리 목적을 위해 제작된 독립적인 비영리 아카이빙 도구입니다.)*
 
-- **Interactive Collection Tracking**: Mark cards as **HAVE (✅)** or **WANT (❤️)** with real-time progress calculation. States are automatically persisted via `localStorage`.
-- **Mobile-Optimized UX**:
-  - Direct on-card touch targets for rapid toggling without misclicks.
-  - High-resolution modal lightbox with full metadata display and synchronous status switching.
-- **Multi-Language Support (i18n)**:
-  - Supports **English (EN)**, **繁體中文 (ZH)**, and **한국어 (KO)**.
-  - Automatically detects browser/system language on initial visit with manual override persistence.
-  - Automatic localization mapping for member names and composite unit cards.
-- **One-Click Checklist Export**: Export your filtered card grid into a high-resolution PNG image directly from the browser using `html-to-image`.
-- **Multi-Dimension Filtering**: Filter cards dynamically by Member, Era/Album, and Category, combined with live keyword search across names, IDs, and localized aliases.
-- **Centralized Community Hub**: Integrated contribution links (Google Form) and direct navigation to official channels and member social accounts.
-
----
-
-## 🛠 Tech Stack
-
-- **Framework**: React 18
-- **Build Tool**: Vite
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React & Custom SVG Assets
-- **Image Processing / Export**: `html-to-image`
-- **Deployment**: GitHub Pages via GitHub Actions
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js (v18 or higher recommended)
-- npm or pnpm
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/vagazinevvs/photocard-archive.git
-   cd photocard-archive
-    ```
-2. Install dependencies:
-
-  ```bash
-  npm install
-  ```
-3. Start the local development server:
-  
-  ```bash
-  npm run dev
-  ```
-
-4. Build for production:
-  
-  ```bash
-  npm run build
-  ```
-
-## 📂 Project Architecture
-
-```text
-photocard-archive/
-├── public/
-│   ├── cards.json         # Master database of photocard metadata
-│   ├── VVS_logo.svg       # Favicon and brand icon
-│   └── cards/             # Locally hosted photocard scans
-├── src/
-│   ├── types/
-│   │   └── card.ts        # Photocard data type interfaces
-│   ├── i18n.ts            # Dictionaries, member name mapping & language detection
-│   ├── App.tsx            # Main application layout, filtering & grid
-│   ├── main.tsx           # React entry point
-│   └── index.css          # Tailwind CSS directives
-├── index.html
-└── vite.config.ts
-```
-
-```mermaid
-graph TD
-    subgraph Local [本機端：離線處理]
-        A[原始圖片 raw_incoming] -->|執行 local_pipeline.py| B[裁切 & 產出 .webp]
-        B --> C[更新本機 public/cards.json]
-        C -->|git push| D[推送到 GitHub 倉庫]
-    end
-
-    subgraph Cloud [雲端與資料同步：GitHub Actions]
-        D --> E[觸發 deploy.yml]
-        E -->|執行 cloud_pipeline.py| F{Google Sheets 智慧同步}
-        F -->|檢查 submit 表 status: process| G[寫入主 cards 工作表]
-        F -->|比對並補登本機 cards.json 缺漏| G
-        G --> H[從 cards 工作表撈取完整資料]
-        H --> I[覆蓋更新 public/cards.json]
-        I --> J[執行 npm run build & 部署至 GitHub Pages]
-    end
-```
-
-
-## 🤝 Contributing
-We welcome photocard scan submissions, missing data reports, and translations!
-
-Submit Photocards: Use the Contribute button located in the footer to submit missing card scans or corrections via our submission form.
-
-Code Contributions: Pull requests for bug fixes and UI performance enhancements are welcome.
-
-## ⚖️ Disclaimer
-Copyright ⓒ 2026 VVS Archive.
-
-All rights to photocard artwork and related media are reserved by VANNER and their respective copyright holders. This project is a non-profit fan archive created for community collection tracking.
+* All official images, logos, group names, and related intellectual property belong to their respective agencies and copyright holders.  
+  *(所有官方圖片、標誌、團體名稱及相關智慧財產權均歸其各自之經紀公司與版權所有者所有。 / 모든 공식 이미지, 로고, 그룹명 및 관련 지적 재산권은 각 소속사 및 저작권자에게 있습니다.)*
+* This tool is not officially affiliated with, endorsed by, or connected to any K-pop groups, agencies, or official management companies.  
+  *(本工具未與任何 K-pop 團體、經紀公司或官方管理機構有官方合作、背書或關聯。 / 본 도구는 어떠한 K-pop 그룹, 소속사 또는 공식 관리 회사와도 공식적으로 제휴, 보증 또는 연관되어 있지 않습니다.)*
+* All card labels and custom metadata are maintained strictly for local use.  
+  *(所有小卡標籤與自定義元資料皆嚴格僅供本機使用。 / 모든 카드 라벨 및 커스텀 메타데이터는 엄격히 로컬 용도로만 유지됩니다.)*
