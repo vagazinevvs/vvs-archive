@@ -102,6 +102,11 @@ const formatImageUrl = (url?: string): string => {
     return `https://wsrv.nl/?url=${encodeURIComponent(url)}`;
   }
 
+
+  if (url.includes('twimg.com') || url.includes('twitter.com')) {
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}`;
+  }
+
   return url;
 };
 
