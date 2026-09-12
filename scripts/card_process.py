@@ -42,22 +42,56 @@ def center_crop_fallback(img):
         return img[offset_y:offset_y + target_h, :]
 
 def apply_white_balance(bgr_img):
-    result = bgr_img.astype(np.float32)
-    average_b = np.mean(result[:, :, 0])
-    average_g = np.mean(result[:, :, 1])
-    average_r = np.mean(result[:, :, 2])
+    h, w = bgr_img.shape[:2]
+    corner_h = int(h * 0.12)
+    corner_w = int(w * 0.12)
+    
+    corners = {
+        "tl": bgr_img[0:corner_h, 0:corner_w],
+        "tr": bgr_img[0:corner_h, w-corner_w:w],
+        "bl": bgr_img[h-corner_h:h, 0:corner_w],
+        "br": bgr_img[h-corner_h:h, w-corner_w:w]
+    }
+    
+    best_bg = None
+    max_score = -float('inf')
+    
+    for key, patch in corners.items():
+        b_mean = np.mean(patch[:, :, 0])
+        g_mean = np.mean(patch[:, :, 1])
+        r_mean = np.mean(patch[:, :, 2])
+        
+        brightness = (b_mean + g_mean + r_mean) / 3.0
+        color_std = np.std([b_mean, g_mean, r_mean])
+        score = brightness - (color_std * 0.5)
+        
+        if score > max_score:
+            max_score = score
+            best_bg = patch
+            
+    if best_bg is None:
+        best_bg = corners["tr"]
+        
+    average_b = np.mean(best_bg[:, :, 0])
+    average_g = np.mean(best_bg[:, :, 1])
+    average_r = np.mean(best_bg[:, :, 2])
     average = (average_b + average_g + average_r) / 3.0
     
+    result = bgr_img.astype(np.float32)
     if average_b > 0: result[:, :, 0] *= (average / average_b)
     if average_g > 0: result[:, :, 1] *= (average / average_g)
     if average_r > 0: result[:, :, 2] *= (average / average_r)
     
     return np.clip(result, 0, 255).astype(np.uint8)
 
-def crop_card(image_path):
-    img = cv2.imread(image_path)
+def crop_card(image_input):
+    if isinstance(image_input, str):
+        img = cv2.imread(image_input)
+    else:
+        img = image_input
+        
     if img is None:
-        raise ValueError(f"Unable to read image at: {image_path}")
+        raise ValueError("Unable to read image for cropping")
     
     h, w = img.shape[:2]
     img_area = h * w
@@ -140,18 +174,19 @@ def apply_watermark(bgr_image, watermark_text="VVS ARCHIVE"):
 
 def process_card_image(input_path, card_id, output_dir="public/cards"):
     try:
-        cropped_bgr = crop_card(input_path)
-        balanced_bgr = apply_white_balance(cropped_bgr)
-        # 調整亮度與對比度 (alpha: 對比度, beta: 亮度增益)
-        alpha = 1.1  # 可依需求微調對比度 (1.0 為原樣)
-        beta = 15    # 增加亮度數值 (正數調亮)
-        bright_bgr = cv2.convertScaleAbs(balanced_bgr, alpha=alpha, beta=beta)
+        raw_img = cv2.imread(input_path)
+        if raw_img is None:
+            raise ValueError(f"Unable to read image at: {input_path}")
         
+        # Flow: White Balance -> Crop -> Contrast/Brightness -> Resize -> Watermark
+        balanced_bgr = apply_white_balance(raw_img)
+        cropped_bgr = crop_card(balanced_bgr)
+        
+        alpha = 1.1
+        beta = 15
+        bright_bgr = cv2.convertScaleAbs(cropped_bgr, alpha=alpha, beta=beta)
         
         standardized_bgr = cv2.resize(bright_bgr, (800, 1200), interpolation=cv2.INTER_LANCZOS4)
-        
-        # 加上此行檢查進入浮水印前的尺寸
-        #print(f"DEBUG [{card_id}] Input to watermark shape: {standardized_bgr.shape}")
         
         final_pil = apply_watermark(standardized_bgr)
         
@@ -162,3 +197,4 @@ def process_card_image(input_path, card_id, output_dir="public/cards"):
     except Exception as e:
         print(f"Error processing card image {card_id}: {e}")
         return None
+        
