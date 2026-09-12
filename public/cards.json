@@ -186,7 +186,7 @@
   {
     "id": "swy-260829_back",
     "era": "Still With You",
-    "member": "all",
+    "member": "",
     "category": "Event",
     "name": "260829 back",
     "imageUrl": "./cards/swy-260829_back.webp"
@@ -194,7 +194,7 @@
   {
     "id": "swy-back",
     "era": "Still With You",
-    "member": "all",
+    "member": "" ,
     "category": "Event",
     "name": "back",
     "imageUrl": "./cards/swy-back.webp"
