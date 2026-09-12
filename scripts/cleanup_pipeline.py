@@ -21,18 +21,14 @@ def run_cleanup(target_card_id=None, target_member=None):
     cards_sheet = spreadsheet.worksheet("cards")
     cards_records = cards_sheet.get_all_records()
     
-    rows_to_keep = []
+    indices_to_delete = []
     deleted_ids = []
     
-    # 保留表頭
-    header = cards_sheet.row_values(1)
-    
-    for row in cards_records:
+    # 找出符合刪除條件的行號（從第 2 行開始，因為第 1 行是表頭）
+    for idx, row in enumerate(cards_records, start=2):
         card_id = str(row.get("id", ""))
-        member = str(row.get("member", ""))
-        era = str(row.get("era", "")).strip()
+        member = str(row.get("member", "")).strip().lower()
         
-        # 判斷是否符合刪除條件：當 member 為 "delete" 或符合其他指定條件
         is_match = False
         if member == "delete":
             is_match = True
@@ -42,35 +38,18 @@ def run_cleanup(target_card_id=None, target_member=None):
             is_match = True
             
         if is_match:
-            deleted_ids.append(card_id)
-        else:
-            rows_to_keep.append(row)
-            
-        if is_match:
-            deleted_ids.append(card_id)
-        else:
-            rows_to_keep.append(row)
-            
+            indices_to_delete.append(idx)
+            if card_id:
+                deleted_ids.append(card_id)
+                
     if not deleted_ids:
         print("沒有找到符合刪除條件的卡片。")
         return
         
-    # 1. 更新 Google 試算表（清空後重新寫入保留的資料）
-    cards_sheet.clear()
-    cards_sheet.append_row(header)
-    
-    new_rows = []
-    for row in rows_to_keep:
-        new_rows.append([
-            row.get("id", ""),
-            row.get("era", ""),
-            row.get("member", ""),
-            row.get("category", ""),
-            row.get("name", ""),
-            row.get("imageUrl", "")
-        ])
-    if new_rows:
-        cards_sheet.append_rows(new_rows)
+    # 1. 從 Google 試算表中精準刪除該列（由下往上刪除以避免行號位移）
+    indices_to_delete.sort(reverse=True)
+    for row_idx in indices_to_delete:
+        cards_sheet.delete_rows(row_idx)
         
     print(f"🗑️ 已從 Google 試算表中刪除以下卡片: {deleted_ids}")
 
@@ -94,7 +73,6 @@ def run_cleanup(target_card_id=None, target_member=None):
             print(f"🖼️ 已刪除圖片檔案: {img_path}")
 
 if __name__ == "__main__":
-    # 可透過環境變數或參數指定要刪除的 ID 或成員
     target_id = os.environ.get("TARGET_CARD_ID")
     target_mem = os.environ.get("TARGET_MEMBER")
     run_cleanup(target_card_id=target_id, target_member=target_mem)
