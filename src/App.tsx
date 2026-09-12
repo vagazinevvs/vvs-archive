@@ -334,9 +334,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-100 pb-16 selection:bg-indigo-500 selection:text-white">
-      <header className="sticky top-0 z-30 bg-neutral-950/80 backdrop-blur-md border-b border-neutral-800/80 px-4 sm:px-8 py-3.5 shadow-md">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="min-h-screen w-full bg-neutral-950 text-neutral-100 pb-16 selection:bg-indigo-500 selection:text-white flex flex-col items-center">
+      <header className="sticky top-0 z-30 w-full bg-neutral-950/80 backdrop-blur-md border-b border-neutral-800/80 px-4 sm:px-8 py-3.5 shadow-md">
+        <div className="max-w-7xl mx-auto w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-900 border border-neutral-800 p-1.5 shadow-sm">
               <img
@@ -388,7 +388,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-8 pt-6">
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-8 pt-6 flex-1">
         <div className="bg-neutral-900/70 backdrop-blur-sm p-4 sm:p-5 rounded-2xl border border-neutral-800/90 shadow-sm mb-6 flex flex-col gap-3.5">
           <div className="relative">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
@@ -634,7 +634,7 @@ export default function App() {
       </main>
 
       {/* 隱藏的 5 欄專屬匯出模板（包含篩選條件、計數器與完美 5 欄網格，供截圖使用） */}
-      <div className="absolute -z-50 opacity-0 pointer-events-none left-0 top-0 overflow-hidden">
+      <div className="hidden sm:block absolute -z-50 opacity-0 pointer-events-none left-0 top-0 overflow-hidden">
         <div
           ref={templateRef}
           className="bg-neutral-900 p-6 rounded-2xl border border-neutral-800 flex flex-col gap-4 w-[1200px]"
@@ -729,8 +729,8 @@ export default function App() {
         </div>
       </div>
 
-      <footer className="mt-16 border-t border-neutral-800/80 bg-neutral-950 py-12 text-center text-xs text-neutral-500">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col items-center gap-8">
+      <footer className="mt-16 w-full border-t border-neutral-800/80 bg-neutral-950 py-12 text-center text-xs text-neutral-500">
+        <div className="max-w-7xl w-full mx-auto px-4 flex flex-col items-center gap-8">
           <div className="flex flex-col items-center gap-3 w-full">
             <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
               Members Links
