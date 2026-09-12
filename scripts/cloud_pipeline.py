@@ -111,10 +111,14 @@ def run_cloud_pipeline():
                     local_img_path = download_and_process_image(drive_url, card_id)
 
                     if local_img_path:
+                        # 在加入新 row 之前進行名稱標準化
+                        raw_member = str(row.get("member", ""))
+                        standardized_member = ", ".join([standardize_member_name(m) for m in parse_members_python(raw_member)])
+
                         new_rows_from_submit.append([
                             card_id,
                             str(row.get("era", "")),
-                            str(row.get("member", "")),
+                            standardized_member, # 使用標準化後的成員名稱
                             row.get("category"),
                             row.get("name"),
                             local_img_path
@@ -133,6 +137,44 @@ def run_cloud_pipeline():
             
     except Exception as e:
         print(f"Notice: 'submit' sheet processing failed ({e}).")
+
+def parse_members_python(member_str):
+    """
+    Parse member input string from Google Sheets into a standardized list of members.
+    Handles commas, slashes, or mixed delimiters.
+    """
+    if not member_str:
+        return ["all"]
+    
+    # Split by common delimiters like comma, slash, or ampersand
+    raw_parts = re.split(r'[,/&]+', str(member_str))
+    members = []
+    
+    for part in raw_parts:
+        cleaned = part.strip()
+        if cleaned:
+            members.append(cleaned)
+            
+    return members if members else ["all"]
+
+def standardize_member_name(member_name):
+    """
+    Map various spellings or aliases to standardized internal keys.
+    """
+    name_lower = member_name.lower()
+    
+    if any(k in name_lower for k in ['taehwan', '泰煥', '고태운', 'taewoon']):
+        return 'Taehwan'
+    if any(k in name_lower for k in ['hyesung', '慧成', '박혜성']):
+        return 'Hyesung'
+    if any(k in name_lower for k in ['sungkook', '成國', '성국']):
+        return 'Sungkook'
+    if any(k in name_lower for k in ['gon', '原書', '이원서']):
+        return 'Gon'
+    if any(k in name_lower for k in ['yeongkwang', '泳光', '안영준', 'yeonggwang']):
+        return 'Yeongkwang'
+        
+    return member_name
 
 if __name__ == "__main__":
     run_cloud_pipeline()
