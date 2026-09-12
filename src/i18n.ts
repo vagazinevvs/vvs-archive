@@ -65,6 +65,8 @@ export const I18N = {
     noImage: 'No Image',
     viewFull: 'View Full Image',
     copyrightSub: 'All Rights of Photocards Reserved by VANNER',
+    longPressSave: 'Long press the image below to save',
+    close: 'Close',
   },
   zh: {
     title: 'VVS ARCHIVE',
@@ -85,6 +87,8 @@ export const I18N = {
     noImage: '無圖檔',
     viewFull: '檢視大圖',
     copyrightSub: 'All Rights of Photocards Reserved by VANNER',
+    longPressSave: '長按下方圖片即可儲存',
+    close: '關閉',
   },
   ko: {
     title: '삐삐 아카이브',
@@ -105,6 +109,8 @@ export const I18N = {
     noImage: '이미지 없음',
     viewFull: '크게 보기',
     copyrightSub: 'All Rights of Photocards Reserved by VANNER',
+    longPressSave: '아래 이미지를 길게 눌러 저장하세요',
+    close: '닫기',
   },
 } as const;
 

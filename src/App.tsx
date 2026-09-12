@@ -79,20 +79,6 @@ const SOCIAL_LINKS: SocialLinkItem[] = [
   },
 ];
 
-const getMemberBadgeColor = (memberName: string) => {
-  const name = memberName.toLowerCase();
-  if (name.includes('taehwan') || name.includes('泰煥') || name.includes('고태운')) {
-    return 'bg-red-950/70 border-red-800 text-red-300';
-  }
-  if (name.includes('hyesung') || name.includes('慧成') || name.includes('박혜성')) {
-    return 'bg-amber-950/70 border-amber-800 text-amber-300';
-  }
-  if (name.includes('sungkook') || name.includes('成國')) {
-    return 'bg-purple-950/70 border-purple-800 text-purple-300';
-  }
-  return 'bg-indigo-950/70 border-indigo-800 text-indigo-300';
-};
-
 const formatImageUrl = (url?: string): string => {
   if (!url) return '';
 
@@ -127,6 +113,7 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [previewCard, setPreviewCard] = useState<Photocard | null>(null);
+  const [exportedImageUrl, setExportedImageUrl] = useState<string | null>(null);
 
   const [ownedCards, setOwnedCards] = useState<Set<string>>(() => {
     try {
@@ -273,7 +260,7 @@ export default function App() {
         !query ||
         card.name.toLowerCase().includes(query) ||
         card.id.toLowerCase().includes(query) ||
-        localizedMember.includes(query); // ✅ 透過 localizedMember 進行搜尋即可
+        localizedMember.includes(query);
 
       return matchMember && matchEra && matchCat && matchSearch;
     });
@@ -306,20 +293,7 @@ export default function App() {
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
       if (isMobile) {
-        const newWindow = window.open();
-        if (newWindow) {
-          newWindow.document.write(`
-            <html>
-              <head><title>VVS Archive Export</title></head>
-              <body style="margin:0; background:#09090b; display:flex; justify-content:center; align-items:center; height:100vh;">
-                <img src="${dataUrl}" style="max-width:100%; max-height:100%; object-fit:contain;" alt="Exported Checklist" />
-              </body>
-            </html>
-          `);
-          newWindow.document.close();
-        } else {
-          window.location.href = dataUrl;
-        }
+        setExportedImageUrl(dataUrl);
       } else {
         const link = document.createElement('a');
         link.download = `vvs-archive-${new Date().toISOString().slice(0, 10)}.png`;
@@ -388,7 +362,7 @@ export default function App() {
         </div>
       </header>
 
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-8 pt-6 flex-1">
+      <main className="max-w-7xl w-full mx-auto px-4 sm:px-8 pt-6">
         <div className="bg-neutral-900/70 backdrop-blur-sm p-4 sm:p-5 rounded-2xl border border-neutral-800/90 shadow-sm mb-6 flex flex-col gap-3.5">
           <div className="relative">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
@@ -634,7 +608,8 @@ export default function App() {
       </main>
 
       {/* 隱藏的 5 欄專屬匯出模板（包含篩選條件、計數器與完美 5 欄網格，供截圖使用） */}
-      <div className="absolute -z-50 opacity-0 pointer-events-none left-0 top-0 overflow-hidden">
+      {/* 完美隱藏且確保手機版不撐寬的匯出模板容器 */}
+      <div className="absolute left-[-9999px] top-[-9999px] w-[1200px] overflow-hidden pointer-events-none opacity-0">
         <div
           ref={templateRef}
           className="bg-neutral-900 p-6 rounded-2xl border border-neutral-800 flex flex-col gap-4 w-[1200px]"
@@ -846,9 +821,6 @@ export default function App() {
               <h3 className="text-sm font-bold text-neutral-100 truncate mb-2">{previewCard.name}</h3>
               
               <div className="flex flex-wrap gap-1.5 text-[11px]">
-              <span className={`rounded border px-2 py-0.5 font-semibold ${getMemberBadgeColor(formatMultiMemberString(previewCard.member, currentLang))}`}>
-                {formatMultiMemberString(previewCard.member, currentLang)}
-              </span>
                 {previewCard.era && (
                   <span className="rounded bg-neutral-800/60 border border-neutral-700/60 text-neutral-400 px-2 py-0.5 font-medium">
                     {formatEraName(previewCard.era, currentLang)}
@@ -886,6 +858,42 @@ export default function App() {
                 </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+{exportedImageUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 animate-in fade-in"
+          onClick={() => setExportedImageUrl(null)}
+        >
+          <div
+            className="relative flex flex-col items-center max-w-sm w-full bg-neutral-900 border border-neutral-800 rounded-2xl p-4 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setExportedImageUrl(null)}
+              className="absolute right-3 top-3 rounded-full p-1.5 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <h3 className="text-sm font-bold text-neutral-100 mb-2">{t.longPressSave}</h3>
+
+            <div className="w-full rounded-xl overflow-hidden border border-neutral-800 bg-neutral-950 shadow-inner">
+              <img
+                src={exportedImageUrl}
+                alt="Exported Checklist"
+                className="w-full h-auto object-contain"
+              />
+            </div>
+
+            <button
+              onClick={() => setExportedImageUrl(null)}
+              className="mt-4 w-full py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold rounded-xl transition"
+            >
+              {t.close}
+            </button>
           </div>
         </div>
       )}
