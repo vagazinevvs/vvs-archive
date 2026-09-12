@@ -142,7 +142,13 @@ def process_card_image(input_path, card_id, output_dir="public/cards"):
     try:
         cropped_bgr = crop_card(input_path)
         balanced_bgr = apply_white_balance(cropped_bgr)
-        standardized_bgr = cv2.resize(balanced_bgr, (800, 1200), interpolation=cv2.INTER_LANCZOS4)
+        # 調整亮度與對比度 (alpha: 對比度, beta: 亮度增益)
+        alpha = 1.1  # 可依需求微調對比度 (1.0 為原樣)
+        beta = 15    # 增加亮度數值 (正數調亮)
+        bright_bgr = cv2.convertScaleAbs(balanced_bgr, alpha=alpha, beta=beta)
+        
+        
+        standardized_bgr = cv2.resize(bright_bgr, (800, 1200), interpolation=cv2.INTER_LANCZOS4)
         
         # 加上此行檢查進入浮水印前的尺寸
         #print(f"DEBUG [{card_id}] Input to watermark shape: {standardized_bgr.shape}")

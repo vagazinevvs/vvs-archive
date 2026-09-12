@@ -1,5 +1,13 @@
 [
   {
+    "id": "260510_2pm_sk",
+    "name": "260510 2pm sk",
+    "member": ["all"],
+    "era": "Unknown",
+    "category": "",
+    "imageUrl": "./cards/260510_2pm_sk.webp"
+  },
+  {
     "id": "swy-260510_1-hs",
     "name": "260510 1",
     "member": ["hs"],
@@ -174,5 +182,13 @@
     "era": "swy",
     "category": "Event",
     "imageUrl": "./cards/swy-back.webp"
+  },
+  {
+    "id": "trial-local-Hyesung",
+    "name": "local",
+    "member": ["hyesung"],
+    "era": "trial",
+    "category": "Event",
+    "imageUrl": "./cards/trial-local-Hyesung.webp"
   }
 ]
