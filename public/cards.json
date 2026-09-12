@@ -198,5 +198,21 @@
     "category": "Event",
     "name": "back",
     "imageUrl": "./cards/swy-back.webp"
+  },
+  {
+    "id": "other-2026 bday-Hyesung-12",
+    "era": "other",
+    "member": "Hyesung",
+    "category": "Snapism",
+    "name": "2026 bday",
+    "imageUrl": "./cards/other-2026 bday-Hyesung-12.webp"
+  },
+  {
+    "id": "other-2026 bday-Hyesung-13",
+    "era": "other",
+    "member": "Hyesung",
+    "category": "Snapism",
+    "name": "2026 bday",
+    "imageUrl": "./cards/other-2026 bday-Hyesung-13.webp"
   }
 ]
