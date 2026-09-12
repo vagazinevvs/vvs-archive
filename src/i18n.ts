@@ -25,14 +25,17 @@ export const ERA_TRANSLATIONS: Record<Language, Record<string, string>> = {
   en: {
     swy: "Still With You",
     caf: "Caffeine",
+    other: "Other"
   },
   zh: {
     swy: "Still With You",
     caf: "咖啡因",
+    other: "其他"
   },
   ko: {
     swy: "Still With You",
     caf: "카페인",
+    other: "기타",
   },
 };
 
