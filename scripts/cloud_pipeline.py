@@ -138,6 +138,17 @@ def run_cloud_pipeline():
     except Exception as e:
         print(f"Notice: 'submit' sheet processing failed ({e}).")
 
+    # 💡 關鍵修正：最後必須重新抓取 cards 工作表的完整內容，並更新寫入 public/cards.json
+    try:
+        all_records = cards_sheet.get_all_records()
+        if all_records:
+            os.makedirs("public", exist_ok=True)
+            with open("public/cards.json", "w", encoding="utf-8") as f:
+                json.dump(all_records, f, ensure_ascii=False, indent=2)
+            print(f"💾 成功同步更新 public/cards.json，共 {len(all_records)} 筆資料。")
+    except Exception as e:
+        print(f"Failed to update public/cards.json: {e}")
+
 def parse_members_python(member_str):
     """
     Parse member input string from Google Sheets into a standardized list of members.
