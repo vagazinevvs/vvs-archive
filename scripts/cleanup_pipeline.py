@@ -30,13 +30,21 @@ def run_cleanup(target_card_id=None, target_member=None):
     for row in cards_records:
         card_id = str(row.get("id", ""))
         member = str(row.get("member", ""))
+        era = str(row.get("era", "")).strip()
         
-        # 判斷是否符合刪除條件（可依 id 或 member 刪除）
+        # 判斷是否符合刪除條件：當 member 為 "delete" 或符合其他指定條件
         is_match = False
+        if member == "delete":
+            is_match = True
         if target_card_id and card_id == target_card_id:
             is_match = True
-        if target_member and target_member.lower() in member.lower():
+        if target_member and target_member.lower() in member:
             is_match = True
+            
+        if is_match:
+            deleted_ids.append(card_id)
+        else:
+            rows_to_keep.append(row)
             
         if is_match:
             deleted_ids.append(card_id)
