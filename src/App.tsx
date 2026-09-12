@@ -12,6 +12,8 @@ import {
   Globe,
   ChevronLeft,
   ChevronRight,
+  Sun,
+  Moon,
 } from 'lucide-react';
 import type { Photocard } from './types/card';
 import {
@@ -335,70 +337,75 @@ export default function App() {
   const ThemeToggle = () => (
     <button
       onClick={() => setIsDark(!isDark)}
-      className={`p-2 rounded-xl text-xs font-medium border transition-colors cursor-pointer ${
+      className={`p-2 rounded-xl transition border cursor-pointer ${
         isDark 
-          ? 'bg-neutral-900 border-neutral-800 text-neutral-200 hover:text-white' 
-          : 'bg-neutral-100 border-neutral-300 text-neutral-800 hover:text-black'
+          ? 'text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/60 border-neutral-800' 
+          : 'text-neutral-600 hover:text-black hover:bg-neutral-100 border-neutral-200'
       }`}
       title="Toggle Theme"
     >
-      {isDark ? '🌙' : '☀️'}
+      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </button>
   );
 
+ 
   return (
     <div className={`min-h-screen w-full ${isDark ? 'bg-neutral-950 text-neutral-100' : 'bg-neutral-50 text-neutral-900'} pb-16 selection:bg-indigo-500 selection:text-white flex flex-col items-center transition-colors`}>
-      <header className={`sticky top-0 z-30 w-full ${isDark ? 'bg-neutral-950/80 border-neutral-800/80' : 'bg-white/80 border-neutral-200'} backdrop-blur-md border-b px-3 sm:px-8 py-3 shadow-md transition-colors`}>
-        <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 min-w-0">
-            <div className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl border p-1.5 shadow-sm ${isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-neutral-200'}`}>
-              <img
-                src={`${import.meta.env.BASE_URL}VVS_logo.svg`}
-                alt="VVS Logo"
-                className="h-full w-full object-contain"
-              />
+      <header className={`sticky top-0 z-30 w-full ${isDark ? 'bg-neutral-950/90 border-neutral-800/80' : 'bg-white/90 border-neutral-200'} backdrop-blur-md border-b px-3 sm:px-8 py-3 shadow-md transition-colors`}>
+        <div className="max-w-7xl mx-auto w-full flex flex-col gap-2.5">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl border p-1.5 shadow-sm ${isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-neutral-200'}`}>
+                <img
+                  src={`${import.meta.env.BASE_URL}VVS_logo.svg`}
+                  alt="VVS Logo"
+                  className="h-full w-full object-contain"
+                />
+              </div>
+              <div className="min-w-0">
+                <h1 className={`text-xs sm:text-lg font-black tracking-wider leading-tight uppercase truncate ${isDark ? 'text-neutral-100' : 'text-neutral-900'}`}>
+                  {t.title}
+                </h1>
+                <p className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate hidden sm:block">
+                  {t.subtitle}
+                </p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <h1 className={`text-xs sm:text-lg font-black tracking-wider leading-tight uppercase truncate ${isDark ? 'text-neutral-100' : 'text-neutral-900'}`}>
-                {t.title}
-              </h1>
-              <p className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate hidden sm:block">
-                {t.subtitle}
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            <ThemeToggle />
-
-            <div className={`flex items-center gap-1.5 border px-2.5 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold ${isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-neutral-200 shadow-xs'}`}>
-              <span className="flex items-center gap-1 text-indigo-500">
-                <Check className="h-3 w-3 stroke-[3]" /> <span className="hidden xs:inline">Have:</span> {filteredStats.have}
-              </span>
-              <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>|</span>
-              <span className="flex items-center gap-1 text-rose-500">
-                <Heart className="h-3 w-3 fill-current" /> <span className="hidden xs:inline">Want:</span> {filteredStats.want}
-              </span>
-              <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>/</span>
-              <span className="text-neutral-500 font-medium">{filteredStats.total}</span>
-            </div>
-
-            <button
-              onClick={handleReset}
-              title="Reset"
-              className={`p-2 rounded-xl transition border ${isDark ? 'text-neutral-400 hover:text-red-400 hover:bg-neutral-800/60 border-neutral-800' : 'text-neutral-600 hover:text-red-600 hover:bg-neutral-100 border-neutral-200'}`}
-            >
-              <RotateCcw className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            </button>
 
             <button
               onClick={handleExport}
               disabled={isExporting || loading}
-              className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-500 active:scale-98 disabled:opacity-50 transition shadow-sm shadow-indigo-600/30 cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-500 active:scale-98 disabled:opacity-50 transition shadow-sm shadow-indigo-600/30 shrink-0 cursor-pointer"
             >
-              <Download className="h-3.5 w-3.5" />
-              <span className="hidden sm:inline">{isExporting ? t.exporting : t.export}</span>
+              <Download className="h-4 w-4" />
+              <span>{isExporting ? t.exporting : t.export}</span>
             </button>
+          </div>
+          
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-neutral-200/60 dark:border-neutral-800/80">
+            <ThemeToggle />
+
+            <div className="flex items-center gap-2">
+              <div className={`flex items-center gap-1.5 border px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold ${isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-neutral-200 shadow-xs'}`}>
+                <span className="flex items-center gap-1 text-indigo-500">
+                  <Check className="h-3 w-3 stroke-[3]" /> Have: {filteredStats.have}
+                </span>
+                <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>|</span>
+                <span className="flex items-center gap-1 text-rose-500">
+                  <Heart className="h-3 w-3 fill-current" /> Want: {filteredStats.want}
+                </span>
+                <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>/</span>
+                <span className="text-neutral-500 font-medium">{filteredStats.total}</span>
+              </div>
+
+              <button
+                onClick={handleReset}
+                title="Reset"
+                className={`p-2 rounded-xl transition border cursor-pointer flex items-center justify-center ${isDark ? 'text-neutral-400 hover:text-red-400 hover:bg-neutral-800/60 border-neutral-800' : 'text-neutral-600 hover:text-red-600 hover:bg-neutral-100 border-neutral-200'}`}
+              >
+                <RotateCcw className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
       </header>
