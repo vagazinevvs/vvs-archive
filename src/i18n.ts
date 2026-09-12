@@ -15,7 +15,7 @@ export const getInitialLanguage = (): Language => {
     if (browserLang.startsWith('ko')) return 'ko';
     return 'en';
   } catch {
-    return 'zh';
+    return 'en';
   }
 };
 

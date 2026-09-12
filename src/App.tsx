@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { toPng } from 'html-to-image';
+import { toJpeg } from 'html-to-image';
 import {
   Check,
   Heart,
@@ -10,6 +10,8 @@ import {
   X,
   ExternalLink,
   Globe,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import type { Photocard } from './types/card';
 import {
@@ -26,6 +28,7 @@ import {
 const STORAGE_KEY_OWNED = 'vanner_collected_cards';
 const STORAGE_KEY_WANTED = 'vanner_wanted_cards';
 const SUBMISSION_FORM_URL = import.meta.env.VITE_FORM_URL || 'https://forms.gle/iTWDSb1ddmCRPBiV7';
+const CARDS_PER_PAGE = 20;
 
 interface SocialLinkItem {
   label: string;
@@ -104,6 +107,10 @@ export default function App() {
   const [cards, setCards] = useState<Photocard[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    return localStorage.getItem('theme') !== 'light';
+  });
+
   const [currentLang, setCurrentLang] = useState<Language>(getInitialLanguage);
   const t = I18N[currentLang];
 
@@ -111,6 +118,7 @@ export default function App() {
   const [selectedMembers, setSelectedMembers] = useState<Set<string>>(new Set(['All']));
   const [selectedEra, setSelectedEra] = useState<string>('All');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [previewCard, setPreviewCard] = useState<Photocard | null>(null);
   const [exportedImageUrl, setExportedImageUrl] = useState<string | null>(null);
@@ -132,6 +140,10 @@ export default function App() {
       return new Set();
     }
   });
+
+  useEffect(() => {
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
 
   useEffect(() => {
     let isMounted = true;
@@ -200,6 +212,7 @@ export default function App() {
       }
       return next;
     });
+    setCurrentPage(1);
   };
 
   const toggleHave = (id: string) => {
@@ -266,6 +279,17 @@ export default function App() {
     });
   }, [cards, selectedMembers, selectedEra, selectedCategory, searchQuery, currentLang]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedEra, selectedCategory]);
+
+  const totalPages = Math.ceil(filteredCards.length / CARDS_PER_PAGE) || 1;
+
+  const paginatedCards = useMemo(() => {
+    const start = (currentPage - 1) * CARDS_PER_PAGE;
+    return filteredCards.slice(start, start + CARDS_PER_PAGE);
+  }, [filteredCards, currentPage]);
+
   const filteredStats = useMemo(() => {
     let haveCount = 0;
     let wantCount = 0;
@@ -284,10 +308,11 @@ export default function App() {
     if (!templateRef.current) return;
     setIsExporting(true);
     try {
-      const dataUrl = await toPng(templateRef.current, {
+      const dataUrl = await toJpeg(templateRef.current, {
         cacheBust: true,
-        pixelRatio: 2,
-        backgroundColor: '#09090b',
+        pixelRatio: 1.5,
+        backgroundColor: isDark ? '#09090b' : '#ffffff',
+        quality: 0.90,
       });
 
       const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -296,7 +321,7 @@ export default function App() {
         setExportedImageUrl(dataUrl);
       } else {
         const link = document.createElement('a');
-        link.download = `vvs-archive-${new Date().toISOString().slice(0, 10)}.png`;
+        link.download = `vvs-archive-${new Date().toISOString().slice(0, 10)}.jpg`;
         link.href = dataUrl;
         link.click();
       }
@@ -307,76 +332,96 @@ export default function App() {
     }
   };
 
+  const ThemeToggle = () => (
+    <button
+      onClick={() => setIsDark(!isDark)}
+      className={`p-2 rounded-xl text-xs font-medium border transition-colors cursor-pointer ${
+        isDark 
+          ? 'bg-neutral-900 border-neutral-800 text-neutral-200 hover:text-white' 
+          : 'bg-neutral-100 border-neutral-300 text-neutral-800 hover:text-black'
+      }`}
+      title="Toggle Theme"
+    >
+      {isDark ? '🌙' : '☀️'}
+    </button>
+  );
+
   return (
-    <div className="min-h-screen w-full bg-neutral-950 text-neutral-100 pb-16 selection:bg-indigo-500 selection:text-white flex flex-col items-center">
-      <header className="sticky top-0 z-30 w-full bg-neutral-950/80 backdrop-blur-md border-b border-neutral-800/80 px-4 sm:px-8 py-3.5 shadow-md">
-        <div className="max-w-7xl mx-auto w-full flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-900 border border-neutral-800 p-1.5 shadow-sm">
+    <div className={`min-h-screen w-full ${isDark ? 'bg-neutral-950 text-neutral-100' : 'bg-neutral-50 text-neutral-900'} pb-16 selection:bg-indigo-500 selection:text-white flex flex-col items-center transition-colors`}>
+      <header className={`sticky top-0 z-30 w-full ${isDark ? 'bg-neutral-950/80 border-neutral-800/80' : 'bg-white/80 border-neutral-200'} backdrop-blur-md border-b px-3 sm:px-8 py-3 shadow-md transition-colors`}>
+        <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <div className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-xl border p-1.5 shadow-sm ${isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-neutral-200'}`}>
               <img
                 src={`${import.meta.env.BASE_URL}VVS_logo.svg`}
                 alt="VVS Logo"
                 className="h-full w-full object-contain"
               />
             </div>
-            <div>
-              <h1 className="text-base sm:text-lg font-black tracking-wider text-neutral-100 leading-tight uppercase">
+            <div className="min-w-0">
+              <h1 className={`text-xs sm:text-lg font-black tracking-wider leading-tight uppercase truncate ${isDark ? 'text-neutral-100' : 'text-neutral-900'}`}>
                 {t.title}
               </h1>
-              <p className="text-[11px] text-neutral-400 font-medium hidden sm:block">
+              <p className="text-[10px] sm:text-[11px] text-neutral-500 font-medium truncate hidden sm:block">
                 {t.subtitle}
               </p>
             </div>
           </div>
+          
+          <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
+            <ThemeToggle />
 
-          <div className="flex items-center gap-2.5 self-end sm:self-auto">
-            <div className="flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3.5 py-1.5 rounded-full text-xs font-semibold">
-              <span className="flex items-center gap-1 text-indigo-400">
-                <Check className="h-3 w-3 stroke-[3]" /> Have: {filteredStats.have}
+            <div className={`flex items-center gap-1.5 border px-2.5 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold ${isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-neutral-200 shadow-xs'}`}>
+              <span className="flex items-center gap-1 text-indigo-500">
+                <Check className="h-3 w-3 stroke-[3]" /> <span className="hidden xs:inline">Have:</span> {filteredStats.have}
               </span>
-              <span className="text-neutral-700">|</span>
-              <span className="flex items-center gap-1 text-rose-400">
-                <Heart className="h-3 w-3 fill-current" /> Want: {filteredStats.want}
+              <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>|</span>
+              <span className="flex items-center gap-1 text-rose-500">
+                <Heart className="h-3 w-3 fill-current" /> <span className="hidden xs:inline">Want:</span> {filteredStats.want}
               </span>
-              <span className="text-neutral-700">/</span>
-              <span className="text-neutral-400 font-medium">{filteredStats.total}</span>
+              <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>/</span>
+              <span className="text-neutral-500 font-medium">{filteredStats.total}</span>
             </div>
 
             <button
               onClick={handleReset}
               title="Reset"
-              className="p-2 text-neutral-400 hover:text-red-400 hover:bg-neutral-800/60 rounded-lg transition border border-transparent hover:border-neutral-700"
+              className={`p-2 rounded-xl transition border ${isDark ? 'text-neutral-400 hover:text-red-400 hover:bg-neutral-800/60 border-neutral-800' : 'text-neutral-600 hover:text-red-600 hover:bg-neutral-100 border-neutral-200'}`}
             >
-              <RotateCcw className="h-4 w-4" />
+              <RotateCcw className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </button>
 
             <button
               onClick={handleExport}
               disabled={isExporting || loading}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-500 active:scale-98 disabled:opacity-50 transition shadow-sm shadow-indigo-600/30"
+              className="inline-flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-500 active:scale-98 disabled:opacity-50 transition shadow-sm shadow-indigo-600/30 cursor-pointer"
             >
               <Download className="h-3.5 w-3.5" />
-              {isExporting ? t.exporting : t.export}
+              <span className="hidden sm:inline">{isExporting ? t.exporting : t.export}</span>
             </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl w-full mx-auto px-4 sm:px-8 pt-6">
-        <div className="bg-neutral-900/70 backdrop-blur-sm p-4 sm:p-5 rounded-2xl border border-neutral-800/90 shadow-sm mb-6 flex flex-col gap-3.5">
+      <main className="max-w-7xl w-full mx-auto px-3 sm:px-8 pt-4 sm:pt-6">
+        <div className={`backdrop-blur-sm p-3.5 sm:p-5 rounded-2xl border shadow-sm mb-6 flex flex-col gap-3 transition-colors ${isDark ? 'bg-neutral-900/70 border-neutral-800/90' : 'bg-white/80 border-neutral-200'}`}>
           <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-500" />
+            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
             <input
               type="text"
               placeholder={t.searchPlaceholder}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-neutral-800 bg-neutral-950/60 py-2 pl-9 pr-4 text-xs sm:text-sm text-neutral-100 placeholder-neutral-500 focus:border-indigo-500 focus:bg-neutral-950 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 transition"
+              className={`w-full rounded-xl border py-2 pl-9 pr-4 text-xs sm:text-sm transition focus:outline-none focus:ring-1 focus:ring-indigo-500/30 ${
+                isDark 
+                  ? 'border-neutral-800 bg-neutral-950/60 text-neutral-100 placeholder-neutral-500 focus:border-indigo-500 focus:bg-neutral-950' 
+                  : 'border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-400 focus:border-indigo-500 focus:bg-white'
+              }`}
             />
           </div>
 
           <div className="flex items-center gap-2 flex-wrap text-xs">
-            <span className="text-[11px] font-bold text-neutral-400 uppercase w-16 shrink-0">
+            <span className="text-[11px] font-bold text-neutral-500 uppercase w-16 shrink-0">
               {t.member} {selectedMembers.has('All') ? '' : `(${selectedMembers.size})`}
             </span>
             <div className="flex flex-wrap gap-1.5">
@@ -388,34 +433,34 @@ export default function App() {
                   if (memberKey === 'All') {
                     return active
                       ? 'bg-indigo-600 text-white shadow-xs'
-                      : 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white';
+                      : isDark ? 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white' : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 hover:text-black';
                   }
                   const name = memberKey.toLowerCase();
                   if (name.includes('taehwan') || name.includes('泰煥') || name.includes('고태운')) {
                     return active
                       ? 'bg-red-600 text-white shadow-xs shadow-red-600/30'
-                      : 'bg-red-950/40 border border-red-900/60 text-red-300 hover:bg-red-900/50 hover:text-white';
+                      : isDark ? 'bg-red-950/40 border border-red-900/60 text-red-300 hover:bg-red-900/50 hover:text-white' : 'bg-red-50 border border-red-200 text-red-700 hover:bg-red-100';
                   }
                   if (name.includes('hyesung') || name.includes('慧成') || name.includes('박혜성')) {
                     return active
                       ? 'bg-amber-600 text-white shadow-xs shadow-amber-600/30'
-                      : 'bg-amber-950/40 border border-amber-900/60 text-amber-300 hover:bg-amber-900/50 hover:text-white';
+                      : isDark ? 'bg-amber-950/40 border border-amber-900/60 text-amber-300 hover:bg-amber-900/50 hover:text-white' : 'bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100';
                   }
                   if (name.includes('sungkook') || name.includes('成國')) {
                     return active
                       ? 'bg-purple-600 text-white shadow-xs shadow-purple-600/30'
-                      : 'bg-purple-950/40 border border-purple-900/60 text-purple-300 hover:bg-purple-900/50 hover:text-white';
+                      : isDark ? 'bg-purple-950/40 border border-purple-900/60 text-purple-300 hover:bg-purple-900/50 hover:text-white' : 'bg-purple-50 border border-purple-200 text-purple-700 hover:bg-purple-100';
                   }
                   return active
                     ? 'bg-indigo-600 text-white shadow-xs'
-                    : 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white';
+                    : isDark ? 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white' : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300';
                 };
 
                 return (
                   <button
                     key={m}
                     onClick={() => toggleMember(m)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${getFilterButtonStyle(m, isSelected)}`}
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${getFilterButtonStyle(m, isSelected)}`}
                   >
                     {label}
                   </button>
@@ -426,16 +471,16 @@ export default function App() {
 
           {eras.length > 1 && (
             <div className="flex items-center gap-2 flex-wrap text-xs">
-              <span className="text-[11px] font-bold text-neutral-400 uppercase w-16 shrink-0">{t.era}</span>
+              <span className="text-[11px] font-bold text-neutral-500 uppercase w-16 shrink-0">{t.era}</span>
               <div className="flex flex-wrap gap-1.5">
                 {eras.map((e) => (
                   <button
                     key={e}
                     onClick={() => setSelectedEra(e)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                       selectedEra === e
-                        ? 'bg-neutral-100 text-neutral-900 font-bold shadow-xs'
-                        : 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white'
+                        ? isDark ? 'bg-neutral-100 text-neutral-900 font-bold shadow-xs' : 'bg-neutral-900 text-white font-bold shadow-xs'
+                        : isDark ? 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white' : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 hover:text-black'
                     }`}
                   >
                     {e === 'All' ? t.all : formatEraName(e, currentLang)}
@@ -447,16 +492,16 @@ export default function App() {
 
           {categories.length > 1 && (
             <div className="flex items-center gap-2 flex-wrap text-xs">
-              <span className="text-[11px] font-bold text-neutral-400 uppercase w-16 shrink-0">{t.category}</span>
+              <span className="text-[11px] font-bold text-neutral-500 uppercase w-16 shrink-0">{t.category}</span>
               <div className="flex flex-wrap gap-1.5">
                 {categories.map((c) => (
                   <button
                     key={c}
                     onClick={() => setSelectedCategory(c)}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${
+                    className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                       selectedCategory === c
-                        ? 'bg-neutral-100 text-neutral-900 font-bold shadow-xs'
-                        : 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white'
+                        ? isDark ? 'bg-neutral-100 text-neutral-900 font-bold shadow-xs' : 'bg-neutral-900 text-white font-bold shadow-xs'
+                        : isDark ? 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white' : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 hover:text-black'
                     }`}
                   >
                     {c === 'All' ? t.all : c}
@@ -467,7 +512,7 @@ export default function App() {
           )}
 
           {(!selectedMembers.has('All') || selectedEra !== 'All' || selectedCategory !== 'All' || searchQuery.trim() !== '') && (
-            <div className="flex justify-end pt-2 border-t border-neutral-800/80">
+            <div className={`flex justify-end pt-2 border-t ${isDark ? 'border-neutral-800/80' : 'border-neutral-200'}`}>
               <button
                 onClick={() => {
                   setSelectedMembers(new Set(['All']));
@@ -475,7 +520,7 @@ export default function App() {
                   setSelectedCategory('All');
                   setSearchQuery('');
                 }}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-neutral-300 text-xs font-semibold transition"
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${isDark ? 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300' : 'bg-neutral-200 hover:bg-neutral-300 text-neutral-700'}`}
               >
                 <X className="h-3.5 w-3.5" />
                 <span>Clear Filters</span>
@@ -485,141 +530,171 @@ export default function App() {
         </div>
 
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-28 text-neutral-500">
+          <div className="flex flex-col items-center justify-center py-28 text-neutral-400">
             <Loader2 className="h-8 w-8 animate-spin text-indigo-500 mb-3" />
             <p className="text-sm font-semibold">{t.loading}</p>
           </div>
         ) : filteredCards.length === 0 ? (
-          <div className="bg-neutral-900/50 rounded-2xl border border-neutral-800/80 p-12 text-center text-neutral-500">
+          <div className={`rounded-2xl border p-12 text-center text-neutral-400 ${isDark ? 'bg-neutral-900/50 border-neutral-800/80' : 'bg-white border-neutral-200 shadow-xs'}`}>
             <p className="text-sm font-medium">{t.noCards}</p>
           </div>
         ) : (
-          <div className="bg-neutral-900/60 p-4 sm:p-6 rounded-2xl border border-neutral-800 shadow-sm grid grid-cols-2 sm:grid-cols-5 gap-3 sm:gap-4">
-            {filteredCards.map((card) => {
-              const isOwned = ownedCards.has(card.id);
-              const isWanted = wantedCards.has(card.id);
-              const imgSrc = formatImageUrl(card.imageUrl || (card as any).photo);
-              const cardCat = card.category || (card as any).catagory;
-              const displayMember = formatMultiMemberString(card.member, currentLang);
+          <>
+            <div className={`p-3 sm:p-6 rounded-2xl border shadow-sm grid grid-cols-2 sm:grid-cols-5 gap-2.5 sm:gap-4 transition-colors ${isDark ? 'bg-neutral-900/60 border-neutral-800' : 'bg-white border-neutral-200'}`}>
+              {paginatedCards.map((card) => {
+                const isOwned = ownedCards.has(card.id);
+                const isWanted = wantedCards.has(card.id);
+                const imgSrc = formatImageUrl(card.imageUrl || (card as any).photo);
+                const cardCat = card.category || (card as any).catagory;
+                const displayMember = formatMultiMemberString(card.member, currentLang);
 
-              return (
-                <div
-                  key={card.id}
-                  onClick={() => setPreviewCard(card)}
-                  className={`group relative flex flex-col rounded-xl overflow-hidden cursor-pointer select-none transition-all duration-200 ${
-                    isOwned
-                      ? 'border-2 border-indigo-500 ring-4 ring-indigo-500/20 shadow-xl shadow-indigo-500/10 bg-neutral-900 -translate-y-1'
-                      : isWanted
-                      ? 'border-2 border-rose-500 ring-4 ring-rose-500/20 shadow-xl shadow-rose-500/10 bg-neutral-900 -translate-y-1'
-                      : 'border border-neutral-800 bg-neutral-900/90 hover:border-neutral-700 hover:shadow-lg'
-                  }`}
-                >
-                  <div className="aspect-[55/85] w-full bg-neutral-950 relative overflow-hidden">
-                    {imgSrc ? (
-                      <img
-                        src={imgSrc}
-                        alt={card.name}
-                        crossOrigin="anonymous"
-                        loading="lazy"
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-neutral-600 text-xs">
-                        {t.noImage}
-                      </div>
-                    )}
-
-                    <button
-                      type="button"
-                      title="Have"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleHave(card.id);
-                      }}
-                      className={`absolute top-2 left-2 z-10 flex h-7 w-7 items-center justify-center rounded-full transition-all active:scale-90 ${
-                        isOwned
-                          ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/50 scale-105'
-                          : 'bg-black/60 text-neutral-400 hover:text-white hover:bg-black/80 backdrop-blur-xs border border-white/10'
-                      }`}
-                    >
-                      <Check className="h-4 w-4 stroke-[3]" />
-                    </button>
-
-                    <button
-                      type="button"
-                      title="Want"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        toggleWant(card.id);
-                      }}
-                      className={`absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full transition-all active:scale-90 ${
-                        isWanted
-                          ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/50 scale-105'
-                          : 'bg-black/60 text-neutral-400 hover:text-rose-400 hover:bg-black/80 backdrop-blur-xs border border-white/10'
-                      }`}
-                    >
-                      <Heart className={`h-4 w-4 ${isWanted ? 'fill-current' : ''}`} />
-                    </button>
-                  </div>
-
+                return (
                   <div
-                    className={`p-2.5 flex flex-col flex-1 justify-between transition-colors ${
+                    key={card.id}
+                    onClick={() => setPreviewCard(card)}
+                    className={`group relative flex flex-col rounded-xl overflow-hidden cursor-pointer select-none transition-all duration-200 ${
                       isOwned
-                        ? 'bg-indigo-950/30 border-t border-indigo-900/50'
+                        ? 'border-2 border-indigo-500 ring-4 ring-indigo-500/20 shadow-xl shadow-indigo-500/10 -translate-y-1'
                         : isWanted
-                        ? 'bg-rose-950/30 border-t border-rose-900/50'
-                        : 'bg-neutral-900 border-t border-neutral-800/80'
+                        ? 'border-2 border-rose-500 ring-4 ring-rose-500/20 shadow-xl shadow-rose-500/10 -translate-y-1'
+                        : isDark ? 'border border-neutral-800 bg-neutral-900/90 hover:border-neutral-700 hover:shadow-lg' : 'border border-neutral-200 bg-white hover:border-neutral-300 hover:shadow-md'
                     }`}
                   >
-                    <p
-                      className={`text-xs font-bold truncate ${
-                        isOwned
-                          ? 'text-indigo-200'
-                          : isWanted
-                          ? 'text-rose-200'
-                          : 'text-neutral-200'
-                      }`}
-                      title={card.name}
-                    >
-                      {card.name}
-                    </p>
-                    <div className="flex justify-between items-center text-[10px] text-neutral-400 mt-1">
-                      <span className="truncate pr-1 font-medium text-neutral-400">{displayMember}</span>
-                      {cardCat && (
-                        <span
-                          className={`shrink-0 px-1.5 py-0.5 rounded font-medium ${
-                            isOwned
-                              ? 'bg-indigo-950 text-indigo-300 border border-indigo-800/60'
-                              : isWanted
-                              ? 'bg-rose-950 text-rose-300 border border-rose-800/60'
-                              : 'bg-neutral-800 text-neutral-400 border border-neutral-700/50'
-                          }`}
-                        >
-                          {cardCat}
-                        </span>
+                    <div className={`aspect-[55/85] w-full relative overflow-hidden ${isDark ? 'bg-neutral-950' : 'bg-neutral-100'}`}>
+                      {imgSrc ? (
+                        <img
+                          src={imgSrc}
+                          alt={card.name}
+                          crossOrigin="anonymous"
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-neutral-400 text-xs">
+                          {t.noImage}
+                        </div>
                       )}
+
+                      <button
+                        type="button"
+                        title="Have"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleHave(card.id);
+                        }}
+                        className={`absolute top-2 left-2 z-10 flex h-7 w-7 items-center justify-center rounded-full transition-all active:scale-90 cursor-pointer ${
+                          isOwned
+                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/50 scale-105'
+                            : 'bg-black/60 text-neutral-300 hover:text-white hover:bg-black/80 backdrop-blur-xs border border-white/10'
+                        }`}
+                      >
+                        <Check className="h-4 w-4 stroke-[3]" />
+                      </button>
+
+                      <button
+                        type="button"
+                        title="Want"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleWant(card.id);
+                        }}
+                        className={`absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full transition-all active:scale-90 cursor-pointer ${
+                          isWanted
+                            ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/50 scale-105'
+                            : 'bg-black/60 text-neutral-300 hover:text-rose-400 hover:bg-black/80 backdrop-blur-xs border border-white/10'
+                        }`}
+                      >
+                        <Heart className={`h-4 w-4 ${isWanted ? 'fill-current' : ''}`} />
+                      </button>
+                    </div>
+
+                    <div
+                      className={`p-2 sm:p-2.5 flex flex-col flex-1 justify-between transition-colors ${
+                        isOwned
+                          ? isDark ? 'bg-indigo-950/30 border-t border-indigo-900/50' : 'bg-indigo-50 border-t border-indigo-100'
+                          : isWanted
+                          ? isDark ? 'bg-rose-950/30 border-t border-rose-900/50' : 'bg-rose-50 border-t border-rose-100'
+                          : isDark ? 'bg-neutral-900 border-t border-neutral-800/80' : 'bg-white border-t border-neutral-200'
+                      }`}
+                    >
+                      <p
+                        className={`text-xs font-bold truncate ${
+                          isOwned
+                            ? isDark ? 'text-indigo-200' : 'text-indigo-900'
+                            : isWanted
+                            ? isDark ? 'text-rose-200' : 'text-rose-900'
+                            : isDark ? 'text-neutral-200' : 'text-neutral-800'
+                        }`}
+                        title={card.name}
+                      >
+                        {card.name}
+                      </p>
+                      <div className="flex justify-between items-center text-[10px] text-neutral-500 mt-1">
+                        <span className="truncate pr-1 font-medium">{displayMember}</span>
+                        {cardCat && (
+                          <span
+                            className={`shrink-0 px-1.5 py-0.5 rounded font-medium ${
+                              isOwned
+                                ? isDark ? 'bg-indigo-950 text-indigo-300 border border-indigo-800/60' : 'bg-indigo-100 text-indigo-800 border border-indigo-200'
+                                : isWanted
+                                ? isDark ? 'bg-rose-950 text-rose-300 border border-rose-800/60' : 'bg-rose-100 text-rose-800 border border-rose-200'
+                                : isDark ? 'bg-neutral-800 text-neutral-400 border border-neutral-700/50' : 'bg-neutral-100 text-neutral-600 border border-neutral-200'
+                            }`}
+                          >
+                            {cardCat}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+
+            {totalPages > 1 && (
+              <div className="flex items-center justify-center gap-3 mt-6">
+                <button
+                  onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+                  disabled={currentPage === 1}
+                  className={`p-2 rounded-xl border transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                    isDark
+                      ? 'bg-neutral-900 border-neutral-800 text-neutral-300 hover:bg-neutral-800'
+                      : 'bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-100'
+                  }`}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <span className="text-xs font-semibold text-neutral-400">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+                  disabled={currentPage === totalPages}
+                  className={`p-2 rounded-xl border transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed ${
+                    isDark
+                      ? 'bg-neutral-900 border-neutral-800 text-neutral-300 hover:bg-neutral-800'
+                      : 'bg-white border-neutral-200 text-neutral-700 hover:bg-neutral-100'
+                  }`}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+          </>
         )}
       </main>
 
-      {/* 隱藏的 5 欄專屬匯出模板（包含篩選條件、計數器與完美 5 欄網格，供截圖使用） */}
-      {/* 完美隱藏且確保手機版不撐寬的匯出模板容器 */}
       <div className="absolute left-[-9999px] top-[-9999px] w-[1200px] overflow-hidden pointer-events-none opacity-0">
         <div
           ref={templateRef}
-          className="bg-neutral-900 p-6 rounded-2xl border border-neutral-800 flex flex-col gap-4 w-[1200px]"
+          className={`p-6 rounded-2xl border flex flex-col gap-4 w-[1200px] ${isDark ? 'bg-neutral-900 border-neutral-800 text-neutral-100' : 'bg-white border-neutral-200 text-neutral-900'}`}
         >
-          <div className="flex items-center justify-between border-b border-neutral-800 pb-4 px-1">
+          <div className={`flex items-center justify-between border-b pb-4 px-1 ${isDark ? 'border-neutral-800' : 'border-neutral-200'}`}>
             <div className="flex flex-col gap-1">
-              <h2 className="text-base font-black tracking-wider text-neutral-100 uppercase">
+              <h2 className="text-base font-black tracking-wider uppercase">
                 {t.title} - CHECKLIST
               </h2>
-              <div className="flex items-center gap-2 text-xs text-neutral-400 font-medium">
+              <div className="flex items-center gap-2 text-xs text-neutral-500 font-medium">
                 <span>
                   {t.member}: {selectedMembers.has('All') ? t.all : Array.from(selectedMembers).map(m => formatMemberName(m, currentLang)).join(', ')}
                 </span>
@@ -630,16 +705,16 @@ export default function App() {
                 {searchQuery && <><span>•</span><span>Keyword: "{searchQuery}"</span></>}
               </div>
             </div>
-            <div className="flex items-center gap-2 bg-neutral-950 border border-neutral-800 px-4 py-2 rounded-full text-xs font-semibold">
-              <span className="flex items-center gap-1 text-indigo-400">
+            <div className={`flex items-center gap-2 border px-4 py-2 rounded-full text-xs font-semibold ${isDark ? 'bg-neutral-950 border-neutral-800' : 'bg-neutral-100 border-neutral-200'}`}>
+              <span className="flex items-center gap-1 text-indigo-500">
                 <Check className="h-3.5 w-3.5 stroke-[3]" /> Have: {filteredStats.have}
               </span>
-              <span className="text-neutral-700">|</span>
-              <span className="flex items-center gap-1 text-rose-400">
+              <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>|</span>
+              <span className="flex items-center gap-1 text-rose-500">
                 <Heart className="h-3.5 w-3.5 fill-current" /> Want: {filteredStats.want}
               </span>
-              <span className="text-neutral-700">/</span>
-              <span className="text-neutral-300 font-medium">{filteredStats.total}</span>
+              <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>/</span>
+              <span className="font-medium">{filteredStats.total}</span>
             </div>
           </div>
 
@@ -654,15 +729,15 @@ export default function App() {
               return (
                 <div
                   key={`export-${card.id}`}
-                  className={`flex flex-col rounded-xl overflow-hidden bg-neutral-900 ${
+                  className={`flex flex-col rounded-xl overflow-hidden ${
                     isOwned
                       ? 'border-2 border-indigo-500 ring-4 ring-indigo-500/25'
                       : isWanted
                       ? 'border-2 border-rose-500 ring-4 ring-rose-500/25'
-                      : 'border border-neutral-800'
+                      : isDark ? 'border border-neutral-800 bg-neutral-900' : 'border border-neutral-200 bg-white'
                   }`}
                 >
-                  <div className="aspect-[55/85] w-full bg-neutral-950 relative overflow-hidden">
+                  <div className={`aspect-[55/85] w-full relative overflow-hidden ${isDark ? 'bg-neutral-950' : 'bg-neutral-100'}`}>
                     {imgSrc && (
                       <img
                         src={imgSrc}
@@ -685,16 +760,16 @@ export default function App() {
                   <div
                     className={`p-2.5 flex flex-col flex-1 justify-between ${
                       isOwned
-                        ? 'bg-indigo-950/30 border-t border-indigo-900/50 text-indigo-200'
+                        ? isDark ? 'bg-indigo-950/30 border-t border-indigo-900/50 text-indigo-200' : 'bg-indigo-50 border-t border-indigo-100 text-indigo-900'
                         : isWanted
-                        ? 'bg-rose-950/30 border-t border-rose-900/50 text-rose-200'
-                        : 'bg-neutral-900 border-t border-neutral-800 text-neutral-200'
+                        ? isDark ? 'bg-rose-950/30 border-t border-rose-900/50 text-rose-200' : 'bg-rose-50 border-t border-rose-100 text-rose-900'
+                        : isDark ? 'bg-neutral-900 border-t border-neutral-800 text-neutral-200' : 'bg-white border-t border-neutral-200 text-neutral-800'
                     }`}
                   >
                     <p className="text-xs font-bold truncate">{card.name}</p>
-                    <div className="flex justify-between items-center text-[10px] text-neutral-400 mt-1">
+                    <div className="flex justify-between items-center text-[10px] text-neutral-500 mt-1">
                       <span className="truncate pr-1 font-medium">{displayMember}</span>
-                      {cardCat && <span className="shrink-0 px-1.5 py-0.5 rounded bg-neutral-800 text-neutral-400">{cardCat}</span>}
+                      {cardCat && <span className={`shrink-0 px-1.5 py-0.5 rounded ${isDark ? 'bg-neutral-800 text-neutral-400' : 'bg-neutral-100 text-neutral-600'}`}>{cardCat}</span>}
                     </div>
                   </div>
                 </div>
@@ -704,7 +779,7 @@ export default function App() {
         </div>
       </div>
 
-      <footer className="mt-16 w-full border-t border-neutral-800/80 bg-neutral-950 py-12 text-center text-xs text-neutral-500">
+      <footer className={`mt-16 w-full border-t py-12 text-center text-xs transition-colors ${isDark ? 'border-neutral-800/80 bg-neutral-950 text-neutral-500' : 'border-neutral-200 bg-white text-neutral-600'}`}>
         <div className="max-w-7xl w-full mx-auto px-4 flex flex-col items-center gap-8">
           <div className="flex flex-col items-center gap-3 w-full">
             <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
@@ -717,7 +792,7 @@ export default function App() {
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-xl border border-neutral-800/90 bg-neutral-900/80 px-3 py-2 text-neutral-300 hover:border-neutral-700 hover:bg-neutral-800 hover:text-white transition active:scale-98 shadow-xs"
+                  className={`flex items-center gap-2 rounded-xl border px-3 py-2 transition active:scale-98 shadow-xs ${isDark ? 'border-neutral-800/90 bg-neutral-900/80 text-neutral-300 hover:border-neutral-700 hover:bg-neutral-800 hover:text-white' : 'border-neutral-200 bg-neutral-50 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-100 hover:text-black'}`}
                 >
                   {item.platform === 'youtube' && (
                     <svg className="h-4 w-4 fill-red-500 shrink-0" viewBox="0 0 24 24">
@@ -741,28 +816,28 @@ export default function App() {
                   )}
 
                   {item.platform === 'x' && (
-                    <span className="font-bold text-sm leading-none text-neutral-200 shrink-0">𝕏</span>
+                    <span className={`font-bold text-sm leading-none shrink-0 ${isDark ? 'text-neutral-200' : 'text-neutral-800'}`}>𝕏</span>
                   )}
 
                   <div className="text-left leading-tight">
-                    <p className="text-xs font-bold">{item.label}</p>
-                    <p className="text-[10px] text-neutral-500">{item.subLabel}</p>
+                    <p className={`text-xs font-bold ${isDark ? 'text-neutral-200' : 'text-neutral-900'}`}>{item.label}</p>
+                    <p className="text-[10px] text-neutral-400">{item.subLabel}</p>
                   </div>
                 </a>
               ))}
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-2 border-t border-neutral-900 w-full max-w-md">
-            <div className="flex items-center rounded-lg border border-neutral-800 bg-neutral-900 p-1 text-xs">
-              <Globe className="h-3.5 w-3.5 text-neutral-500 ml-1.5 mr-1" />
+          <div className={`flex flex-wrap items-center justify-center gap-3 pt-2 border-t w-full max-w-md ${isDark ? 'border-neutral-900' : 'border-neutral-200'}`}>
+            <div className={`flex items-center rounded-lg border p-1 text-xs ${isDark ? 'border-neutral-800 bg-neutral-900' : 'border-neutral-200 bg-neutral-100'}`}>
+              <Globe className="h-3.5 w-3.5 text-neutral-400 ml-1.5 mr-1" />
               {(['en', 'zh', 'ko'] as const).map((lang) => (
                 <button
                   key={lang}
                   onClick={() => setCurrentLang(lang)}
-                  className={`rounded-md px-2.5 py-1 font-semibold transition ${
+                  className={`rounded-md px-2.5 py-1 font-semibold transition cursor-pointer ${
                     currentLang === lang
-                      ? 'bg-neutral-800 text-white shadow-xs'
+                      ? isDark ? 'bg-neutral-800 text-white shadow-xs' : 'bg-white text-black shadow-xs'
                       : 'text-neutral-400 hover:text-neutral-200'
                   }`}
                 >
@@ -775,7 +850,7 @@ export default function App() {
               href={SUBMISSION_FORM_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-neutral-700 bg-neutral-900 hover:bg-neutral-800 hover:text-white text-neutral-300 text-xs font-semibold rounded-lg transition active:scale-98"
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 border text-xs font-semibold rounded-lg transition active:scale-98 ${isDark ? 'border-neutral-700 bg-neutral-900 hover:bg-neutral-800 hover:text-white text-neutral-300' : 'border-neutral-300 bg-neutral-100 hover:bg-neutral-200 hover:text-black text-neutral-700'}`}
             >
               <ExternalLink className="h-3.5 w-3.5 text-neutral-400" />
               <span>{t.contribute}</span>
@@ -783,7 +858,7 @@ export default function App() {
           </div>
 
           <div>
-            <p className="font-medium text-neutral-400">
+            <p className={`font-medium ${isDark ? 'text-neutral-400' : 'text-neutral-700'}`}>
               Copyright ⓒ 2026 VVS Archive
             </p>
             <p className="mt-1 text-[11px] text-neutral-500">
@@ -799,17 +874,17 @@ export default function App() {
           onClick={() => setPreviewCard(null)}
         >
           <div
-            className="relative flex flex-col items-center max-w-xs w-full bg-neutral-900 border border-neutral-800 rounded-2xl p-4 shadow-2xl"
+            className={`relative flex flex-col items-center max-w-xs w-full border rounded-2xl p-4 shadow-2xl ${isDark ? 'bg-neutral-900 border-neutral-800 text-neutral-100' : 'bg-white border-neutral-200 text-neutral-900'}`}
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setPreviewCard(null)}
-              className="absolute right-3 top-3 rounded-full p-1.5 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition"
+              className={`absolute right-3 top-3 rounded-full p-1.5 transition ${isDark ? 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100' : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'}`}
             >
               <X className="h-4 w-4" />
             </button>
 
-            <div className="aspect-[55/85] w-full rounded-xl overflow-hidden border border-neutral-800 bg-neutral-950 shadow-inner mt-2">
+            <div className={`aspect-[55/85] w-full rounded-xl overflow-hidden border shadow-inner mt-2 ${isDark ? 'border-neutral-800 bg-neutral-950' : 'border-neutral-200 bg-neutral-100'}`}>
               <img
                 src={formatImageUrl(previewCard.imageUrl || (previewCard as any).photo)}
                 alt={previewCard.name}
@@ -818,28 +893,28 @@ export default function App() {
             </div>
 
             <div className="w-full mt-3.5 text-left">
-              <h3 className="text-sm font-bold text-neutral-100 truncate mb-2">{previewCard.name}</h3>
+              <h3 className="text-sm font-bold truncate mb-2">{previewCard.name}</h3>
               
               <div className="flex flex-wrap gap-1.5 text-[11px]">
                 {previewCard.era && (
-                  <span className="rounded bg-neutral-800/60 border border-neutral-700/60 text-neutral-400 px-2 py-0.5 font-medium">
+                  <span className={`rounded border px-2 py-0.5 font-medium ${isDark ? 'bg-neutral-800/60 border-neutral-700/60 text-neutral-400' : 'bg-neutral-100 border-neutral-200 text-neutral-600'}`}>
                     {formatEraName(previewCard.era, currentLang)}
                   </span>
                 )}
                 {(previewCard.category || (previewCard as any).catagory) && (
-                  <span className="rounded bg-neutral-800 border border-neutral-700 text-neutral-300 px-2 py-0.5 font-medium">
+                  <span className={`rounded border px-2 py-0.5 font-medium ${isDark ? 'bg-neutral-800 border-neutral-700 text-neutral-300' : 'bg-neutral-100 border-neutral-200 text-neutral-800'}`}>
                     {previewCard.category || (previewCard as any).catagory}
                   </span>
                 )}
               </div>
 
-              <div className="mt-4 pt-3 border-t border-neutral-800 flex gap-2">
+              <div className={`mt-4 pt-3 border-t flex gap-2 ${isDark ? 'border-neutral-800' : 'border-neutral-200'}`}>
                 <button
                   onClick={() => toggleHave(previewCard.id)}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition active:scale-95 ${
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer ${
                     ownedCards.has(previewCard.id)
                       ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
-                      : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                      : isDark ? 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700' : 'bg-neutral-200 text-neutral-800 hover:bg-neutral-300'
                   }`}
                 >
                   <Check className="h-4 w-4 stroke-[2.5]" />
@@ -847,10 +922,10 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => toggleWant(previewCard.id)}
-                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition active:scale-95 ${
+                  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer ${
                     wantedCards.has(previewCard.id)
                       ? 'bg-rose-600 text-white shadow-md shadow-rose-600/30'
-                      : 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700'
+                      : isDark ? 'bg-neutral-800 text-neutral-300 hover:bg-neutral-700' : 'bg-neutral-200 text-neutral-800 hover:bg-neutral-300'
                   }`}
                 >
                   <Heart className={`h-4 w-4 ${wantedCards.has(previewCard.id) ? 'fill-current' : ''}`} />
@@ -862,35 +937,35 @@ export default function App() {
         </div>
       )}
 
-{exportedImageUrl && (
+      {exportedImageUrl && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 animate-in fade-in"
           onClick={() => setExportedImageUrl(null)}
         >
           <div
-            className="relative flex flex-col items-center max-w-sm w-full bg-neutral-900 border border-neutral-800 rounded-2xl p-4 shadow-2xl"
+            className={`relative flex flex-col items-center max-w-sm w-full border rounded-2xl p-4 shadow-2xl ${isDark ? 'bg-neutral-900 border-neutral-800 text-neutral-100' : 'bg-white border-neutral-200 text-neutral-900'}`}
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={() => setExportedImageUrl(null)}
-              className="absolute right-3 top-3 rounded-full p-1.5 text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100 transition"
+              className={`absolute right-3 top-3 rounded-full p-1.5 transition ${isDark ? 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100' : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'}`}
             >
               <X className="h-4 w-4" />
             </button>
 
-            <h3 className="text-sm font-bold text-neutral-100 mb-2">{t.longPressSave}</h3>
+            <h3 className="text-sm font-bold mb-2">{t.longPressSave}</h3>
 
-            <div className="w-full rounded-xl overflow-hidden border border-neutral-800 bg-neutral-950 shadow-inner">
+            <div className={`w-full overflow-hidden rounded-xl border shadow-inner p-2 flex items-center justify-center ${isDark ? 'border-neutral-800 bg-neutral-950' : 'border-neutral-200 bg-neutral-100'}`}>
               <img
                 src={exportedImageUrl}
                 alt="Exported Checklist"
-                className="w-full h-auto object-contain"
+                className="max-h-[60vh] w-auto object-contain rounded-lg"
               />
             </div>
 
             <button
               onClick={() => setExportedImageUrl(null)}
-              className="mt-4 w-full py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold rounded-xl transition"
+              className={`mt-4 w-full py-2 text-xs font-bold rounded-xl transition cursor-pointer ${isDark ? 'bg-neutral-800 hover:bg-neutral-700 text-neutral-200' : 'bg-neutral-200 hover:bg-neutral-300 text-neutral-800'}`}
             >
               {t.close}
             </button>
