@@ -1,13 +1,22 @@
-name: Run Cloud Sheet Pipeline & Deploy
+name: Cleanup Card Pipeline
 
 on:
   workflow_dispatch:
+    inputs:
+      target_card_id:
+        description: 'Card ID to delete (optional)'
+        required: false
+        default: ''
+      target_member:
+        description: 'Member name to delete (optional)'
+        required: false
+        default: ''
 
 permissions:
   contents: write
 
 jobs:
-  run-pipeline-and-deploy:
+  cleanup:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -20,16 +29,17 @@ jobs:
 
       - name: Install Python dependencies
         run: |
-          pip install requests gspread google-auth pillow opencv-python-headless oauth2client 
-      
-      - name: Run Cloud Pipeline (Sync to Sheet)
+          pip install requests gspread google-auth oauth2client
+
+      - name: Run Cleanup Script
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
           SPREADSHEET_ID: ${{ secrets.SPREADSHEET_ID }}
+          TARGET_CARD_ID: ${{ github.event.inputs.target_card_id }}
+          TARGET_MEMBER: ${{ github.event.inputs.target_member }}
         run: |
-          python scripts/cleanup_pipeline.py  
-          python scripts/cloud_pipeline.py
-          
+          python scripts/cleanup_pipeline.py
+
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
@@ -40,15 +50,9 @@ jobs:
           npm install
           npm run build
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
-
-      - name: Commit and push updated cards and images
+      - name: Commit and push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add public/cards.json public/cards/
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: sync cards and generated webp images [skip ci]" && git push)
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore: cleanup deleted cards and webp images [skip ci]" && git push)
