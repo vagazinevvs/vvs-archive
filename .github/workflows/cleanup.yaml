@@ -1,4 +1,4 @@
-name: Cleanup Card Pipeline
+name: Cleanup Card
 
 on:
   workflow_dispatch:
