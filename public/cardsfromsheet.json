@@ -27,7 +27,7 @@
     "category": "Snapism",
     "name": "2025 A",
     "imageUrl": "./cards/other-2025_A-Sungkook-14.webp",
-    "backImageUrl": "./cards/other-2025 A back-Sungkook-15.webp"
+    "backImageUrl": "./cards/other-2025_A_back-Sungkook-15.webp"
   },
   {
     "id": "other-2025_B-Sungkook-16",
@@ -36,7 +36,7 @@
     "category": "Snapism",
     "name": "2025 B",
     "imageUrl": "./cards/other-2025_B-Sungkook-16.webp",
-    "backImageUrl": "./cards/other-2025 B back-Sungkook-17.webp"
+    "backImageUrl": "./cards/other-2025_B_back-Sungkook-17.webp"
   },
   {
     "id": "other-2025_bday_A-sk-4",
@@ -72,7 +72,7 @@
     "category": "Snapism",
     "name": "2026 bday A",
     "imageUrl": "./cards/other-2026_bday_A-Hyesung-13.webp",
-    "backImageUrl": "./cards/other-2026 bday A back-Hyesung-18.webp"
+    "backImageUrl": "./cards/other-2026_bday_A_back-Hyesung-18.webp"
   },
   {
     "id": "other-2026_bday_B-Hyesung-12",
@@ -81,7 +81,7 @@
     "category": "Snapism",
     "name": "2026 bday B",
     "imageUrl": "./cards/other-2026_bday_B-Hyesung-12.webp",
-    "backImageUrl": "./cards/other-2026 bday B back-Hyesung-19.webp"
+    "backImageUrl": "./cards/other-2026_bday_B_back-Hyesung-19.webp"
   },
   {
     "id": "swy-260510_1-hs",
