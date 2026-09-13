@@ -401,7 +401,7 @@ export default function App() {
       }`}
       title="Toggle Theme"
     >
-      {isDark ? <Moon className="h-4 w-4" /> : <Sub className="h-4 w-4" />}
+      {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
     </button>
   );
 
