@@ -46,6 +46,34 @@ export const formatEraName = (eraKey: string, lang: Language): string => {
   return ERA_TRANSLATIONS[lang]?.[lowerKey] || eraKey;
 };
 
+export const CATEGORY_TRANSLATIONS: Record<Language, Record<string, string>> = {
+  en: {
+    "Snapism": "Snapism",
+    "Event": "Event",
+    "Video Call": "Video Call",
+    "Album": "Album",
+    "Other": "Other"
+  },
+  zh: {
+    "Snapism": "Snapism",
+    "Event": "活動",
+    "Video Call": "視訊通話",
+    "Album": "專輯",
+    "Other": "其他"
+  },
+  ko: {
+    "Snapism": "스내피즘",
+    "Event": "이벤트",
+    "Video Call": "영통",
+    "Album": "앨범",
+    "Other": "기타"
+  }
+};
+
+export const formatCategoryName = (category: string, lang: Language): string => {
+  if (!category) return '';
+  return CATEGORY_TRANSLATIONS[lang]?.[category] || category;
+};
 
 // 介面文字字典
 export const I18N = {

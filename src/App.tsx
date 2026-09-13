@@ -24,6 +24,7 @@ import {
   I18N,
   parseMembers,
   formatMemberName,
+  formatCategoryName,
   formatMultiMemberString,
   formatEraName,
 } from './i18n';
@@ -615,7 +616,7 @@ export default function App() {
                         : isDark ? 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white' : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 hover:text-black'
                     }`}
                   >
-                    {c === 'All' ? t.all : c}
+                    {c === 'All' || c === '전체' || c === '全部' ? t.all : formatCategoryName(c, currentLang)}
                   </button>
                 ))}
               </div>
@@ -1029,7 +1030,7 @@ export default function App() {
                 )}
                 {(previewCard.category || (previewCard as any).catagory) && (
                   <span className={`rounded border px-2 py-0.5 font-medium ${isDark ? 'bg-neutral-800 border-neutral-700 text-neutral-300' : 'bg-neutral-100 border-neutral-200 text-neutral-800'}`}>
-                    {previewCard.category || (previewCard as any).catagory}
+                    {formatCategoryName(previewCard.category || (previewCard as any).catagory, currentLang)}
                   </span>
                 )}
               </div>
