@@ -3,7 +3,7 @@ import json
 import gspread
 from google.oauth2.service_account import Credentials
 
-def sync_sheet_to_json(output_path="public/cards.json"):
+def sync_sheet_to_json(output_path="public/cardsfromsheet.json"):
     sa_key = os.environ.get("GCP_SA_KEY")
     spreadsheet_id = os.environ.get("SPREADSHEET_ID")
     

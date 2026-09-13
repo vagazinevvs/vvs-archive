@@ -39,6 +39,8 @@ jobs:
           TARGET_MEMBER: ${{ github.event.inputs.target_member }}
         run: |
           python scripts/cleanup_pipeline.py
+          python scripts/sheet2json.py
+
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
