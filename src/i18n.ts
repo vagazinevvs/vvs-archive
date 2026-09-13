@@ -70,6 +70,7 @@ export const I18N = {
     copyrightSub: 'All Rights of Photocards Reserved by VANNER',
     longPressSave: 'Long press the image below to save',
     close: 'Close',
+    contact: 'Report bug',
   },
   zh: {
     title: 'VVS ARCHIVE',
@@ -92,6 +93,7 @@ export const I18N = {
     copyrightSub: 'All Rights of Photocards Reserved by VANNER',
     longPressSave: '長按下方圖片即可儲存',
     close: '關閉',
+    contact: '回報錯誤',
   },
   ko: {
     title: '삐삐 아카이브',
@@ -114,6 +116,7 @@ export const I18N = {
     copyrightSub: 'All Rights of Photocards Reserved by VANNER',
     longPressSave: '아래 이미지를 길게 눌러 저장하세요',
     close: '닫기',
+    contact: '오류 신고',
   },
 } as const;
 

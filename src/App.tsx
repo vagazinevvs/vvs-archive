@@ -946,6 +946,19 @@ export default function App() {
               <ExternalLink className="h-3.5 w-3.5 text-neutral-400" />
               <span>{t.contribute}</span>
             </a>
+
+            <a
+              href="https://x.com/NC_vvs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 border text-xs font-semibold rounded-lg transition active:scale-98 ${isDark ? 'border-neutral-700 bg-neutral-900 hover:bg-neutral-800 hover:text-white text-neutral-300' : 'border-neutral-300 bg-neutral-100 hover:bg-neutral-200 hover:text-black text-neutral-700'}`}
+              title="Contact"
+            >
+              <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+              <span>{t.contact}</span>
+            </a>
           </div>
 
           <div>
