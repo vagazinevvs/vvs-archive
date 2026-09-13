@@ -3,7 +3,7 @@ import json
 import gspread
 from google.oauth2.service_account import Credentials
 
-def sync_sheet_to_json(output_path="public/cardsfromsheet.json"):
+def sync_sheet_to_json(output_path="public/cards.json"):
     sa_key = os.environ.get("GCP_SA_KEY")
     spreadsheet_id = os.environ.get("SPREADSHEET_ID")
     
@@ -26,12 +26,18 @@ def sync_sheet_to_json(output_path="public/cardsfromsheet.json"):
     cards_data = []
     for row in rows:
         raw_member = row.get("member", "")
-        if isinstance(raw_member, str) and raw_member.strip():
-            member = [m.strip().lower() for m in raw_member.split(",") if m.strip()]
-        elif isinstance(raw_member, list):
-            member = raw_member
+        
+        # 1. 檢查並排除 member 為 back 的獨立條目
+        if isinstance(raw_member, str) and raw_member.strip().lower() == "back":
+            continue
+        elif isinstance(raw_member, list) and any(m.strip().lower() == "back" for m in raw_member):
+            continue
+            
+        # 2. 將 member 保持為單一字串格式
+        if isinstance(raw_member, list):
+            member = raw_member[0] if raw_member else ""
         else:
-            member = []
+            member = str(raw_member).strip()
             
         card_obj = {}
         for key, val in row.items():
