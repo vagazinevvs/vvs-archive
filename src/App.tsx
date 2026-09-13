@@ -401,7 +401,7 @@ export default function App() {
       }`}
       title="Toggle Theme"
     >
-      {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
     </button>
   );
 
@@ -442,48 +442,46 @@ export default function App() {
             <div className="flex items-center gap-2">
               <ThemeToggle />
               <button
-                onClick={() => setSortOrder((prev) => (prev === 'newest' ? 'oldest' : 'newest'))}
-                className={`p-2 rounded-xl border transition cursor-pointer flex items-center justify-center ${
-                  sortOrder === 'oldest'
-                    ? isDark ? 'bg-neutral-700 border-neutral-600 text-neutral-100 shadow-xs' : 'bg-neutral-800 border-neutral-700 text-white shadow-xs'
-                    : isDark 
-                      ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800' 
-                      : 'bg-white border-neutral-200 text-neutral-600 hover:text-black hover:bg-neutral-100'
-                }`}
-                title={`Sort: ${sortOrder}`}
-              >
-                <ArrowUpDown className="h-4 w-4" />
-              </button>
+              onClick={() => setSortOrder((prev) => (prev === 'newest' ? 'oldest' : 'newest'))}
+              className={`p-2 rounded-xl border transition cursor-pointer flex items-center justify-center ${
+                isDark 
+                  ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800' 
+                  : 'bg-white border-neutral-200 text-neutral-600 hover:text-black hover:bg-neutral-100'
+              }`}
+              title={`Sort: ${sortOrder}`}
+            >
+              <ArrowUpDown className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <div
+              onClick={() => setShowBothLabeled(!showBothLabeled)}
+              className={`flex items-center gap-1.5 border px-3 py-2 rounded-xl text-[11px] sm:text-xs font-semibold cursor-pointer transition-colors ${
+                showBothLabeled
+                  ? isDark ? 'bg-neutral-800 border-neutral-600 text-neutral-100 shadow-sm' : 'bg-neutral-200 border-neutral-400 text-neutral-900 shadow-sm'
+                  : isDark ? 'bg-neutral-900 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700 shadow-xs'
+              }`}
+              title="Toggle filter for labeled cards"
+            >
+              <span className="flex items-center gap-1 text-indigo-500">
+                <Check className="h-3 w-3 stroke-[3]" /> {filteredStats.have}
+              </span>
+              <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>|</span>
+              <span className="flex items-center gap-1 text-rose-500">
+                <Heart className="h-3 w-3 fill-current" /> {filteredStats.want}
+              </span>
+              <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>/</span>
+              <span className="font-medium">
+                {filteredStats.total}
+              </span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <div
-                onClick={() => setShowBothLabeled(!showBothLabeled)}
-                className={`flex items-center gap-1.5 border px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold cursor-pointer transition-colors ${
-                  showBothLabeled
-                    ? isDark ? 'bg-neutral-800 border-neutral-600 text-neutral-100 shadow-sm' : 'bg-neutral-200 border-neutral-400 text-neutral-900 shadow-sm'
-                    : isDark ? 'bg-neutral-900 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700 shadow-xs'
-                }`}
-                title="Toggle filter for labeled cards"
-              >
-                <span className="flex items-center gap-1 text-indigo-500">
-                  <Check className="h-3 w-3 stroke-[3]" /> {filteredStats.have}
-                </span>
-                <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>|</span>
-                <span className="flex items-center gap-1 text-rose-500">
-                  <Heart className="h-3 w-3 fill-current" /> {filteredStats.want}
-                </span>
-                <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>/</span>
-                <span className="font-medium">
-                  {filteredStats.total}
-                </span>
-              </div>
-
-              <button
-                onClick={handleReset}
-                title="Reset"
-                className={`p-2 rounded-xl transition border cursor-pointer flex items-center justify-center ${isDark ? 'text-neutral-400 hover:text-red-400 hover:bg-neutral-800/60 border-neutral-800' : 'text-neutral-600 hover:text-red-600 hover:bg-neutral-100 border-neutral-200'}`}
-              >
+            <button
+              onClick={handleReset}
+              title="Reset"
+              className={`p-2 rounded-xl transition border cursor-pointer flex items-center justify-center ${isDark ? 'text-neutral-400 hover:text-red-400 hover:bg-neutral-800/60 border-neutral-800' : 'text-neutral-600 hover:text-red-600 hover:bg-neutral-100 border-neutral-200'}`}
+            >
                 <RotateCcw className="h-4 w-4" />
               </button>
             </div>
