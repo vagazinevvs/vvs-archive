@@ -569,7 +569,7 @@
     "name": "back",
     "imageUrl": "./cards/swy-back.webp"
   },
-=======
+  {
     "id": "Caffeine-260910-Taehwan-20",
     "era": "Caffeine",
     "member": "Taehwan",
@@ -577,5 +577,4 @@
     "name": 260910,
     "imageUrl": "./cards/Caffeine-260910-Taehwan-20.webp"
   }
->>>>>>> 932f56bad34e75d9717f1b30c1eccc9eb6a15f85
 ]
