@@ -21,28 +21,10 @@
     "imageUrl": "./cards/profile_sk.webp"
   },
   {
-    "id": "other-2025_A-Sungkook-14",
-    "era": "other",
-    "member": "Sungkook",
-    "category": "Snapism",
-    "name": "2025 A",
-    "imageUrl": "./cards/other-2025_A-Sungkook-14.webp",
-    "backImageUrl": "./cards/other-2025 A back-Sungkook-15.webp"
-  },
-  {
-    "id": "other-2025_B-Sungkook-16",
-    "era": "other",
-    "member": "Sungkook",
-    "category": "Snapism",
-    "name": "2025 B",
-    "imageUrl": "./cards/other-2025_B-Sungkook-16.webp",
-    "backImageUrl": "./cards/other-2025 B back-Sungkook-17.webp"
-  },
-  {
     "id": "other-2025_bday_A-sk-4",
     "era": "other",
     "member": "Sungkook",
-    "category": "Video Call",
+    "category": "Snapism",
     "name": "2025 bday A",
     "imageUrl": "./cards/other-2025_bday_A-sk-4.webp",
     "backImageUrl": "./cards/other-2025_bday_A_back-sk-5.webp"
@@ -51,7 +33,7 @@
     "id": "other-2025_bday_B-sk-2",
     "era": "other",
     "member": "Sungkook",
-    "category": "Video Call",
+    "category": "Snapism",
     "name": "2025 bday B",
     "imageUrl": "./cards/other-2025_bday_B-sk-2.webp",
     "backImageUrl": "./cards/other-2025_bday_B_back-sk-3.webp"
@@ -60,10 +42,28 @@
     "id": "other-2025_bday_C-sk",
     "era": "other",
     "member": "Sungkook",
-    "category": "Video Call",
+    "category": "Snapism",
     "name": "2025 bday C",
     "imageUrl": "./cards/other-2025_bday_C-sk.webp",
     "backImageUrl": "./cards/other-2025_bday_C_back-sk-1.webp"
+  },
+  {
+    "id": "other-2025_A-Sungkook-14",
+    "era": "other",
+    "member": "Sungkook",
+    "category": "Snapism",
+    "name": "2025 A",
+    "imageUrl": "./cards/other-2025_A-Sungkook-14.webp",
+    "backImageUrl": "./cards/other-2025_A_back-Sungkook-15.webp"
+  },
+  {
+    "id": "other-2025_B-Sungkook-16",
+    "era": "other",
+    "member": "Sungkook",
+    "category": "Snapism",
+    "name": "2025 B",
+    "imageUrl": "./cards/other-2025_B-Sungkook-16.webp",
+    "backImageUrl": "./cards/other-2025_B_back-Sungkook-17.webp"
   },
   {
     "id": "other-2026_bday_A-Hyesung-13",
@@ -72,7 +72,7 @@
     "category": "Snapism",
     "name": "2026 bday A",
     "imageUrl": "./cards/other-2026_bday_A-Hyesung-13.webp",
-    "backImageUrl": "./cards/other-2026 bday A back-Hyesung-18.webp"
+    "backImageUrl": "./cards/other-2026_bday_A_back-Hyesung-18.webp"
   },
   {
     "id": "other-2026_bday_B-Hyesung-12",
@@ -81,7 +81,7 @@
     "category": "Snapism",
     "name": "2026 bday B",
     "imageUrl": "./cards/other-2026_bday_B-Hyesung-12.webp",
-    "backImageUrl": "./cards/other-2026 bday B back-Hyesung-19.webp"
+    "backImageUrl": "./cards/other-2026_bday_B_back-Hyesung-19.webp"
   },
   {
     "id": "swy-260510_1-hs",
@@ -154,114 +154,6 @@
     "name": "260530 2",
     "imageUrl": "./cards/swy-260530_2-sk.webp",
     "backImageUrl": "./cards/swy-back.webp"
-  },
-  {
-    "id": "swy-260712_1-hs",
-    "era": "Still With You",
-    "member": "Hyesung",
-    "category": "Event",
-    "name": "260712 1",
-    "imageUrl": "./cards/swy-260712_1-hs.webp",
-    "backImageUrl": "./cards/swy-back.webp"
-  },
-  {
-    "id": "swy-260712_1-sk",
-    "era": "Still With You",
-    "member": "Sungkook",
-    "category": "Event",
-    "name": "260712 1",
-    "imageUrl": "./cards/swy-260712_1-sk.webp",
-    "backImageUrl": "./cards/swy-back.webp"
-  },
-  {
-    "id": "swy-260712_2-hs",
-    "era": "Still With You",
-    "member": "Hyesung",
-    "category": "Event",
-    "name": "260712 2",
-    "imageUrl": "./cards/swy-260712_2-hs.webp",
-    "backImageUrl": "./cards/swy-back.webp"
-  },
-  {
-    "id": "swy-260712_2-sk",
-    "era": "Still With You",
-    "member": "Sungkook",
-    "category": "Event",
-    "name": "260712 2",
-    "imageUrl": "./cards/swy-260712_2-sk.webp",
-    "backImageUrl": "./cards/swy-back.webp"
-  },
-  {
-    "id": "swy-260725_1-hs",
-    "era": "Still With You",
-    "member": "Hyesung",
-    "category": "Event",
-    "name": "260725 1",
-    "imageUrl": "./cards/swy-260725_1-hs.webp",
-    "backImageUrl": "./cards/swy-back.webp"
-  },
-  {
-    "id": "swy-260725_1-sk",
-    "era": "Still With You",
-    "member": "Sungkook",
-    "category": "Event",
-    "name": "260725 1",
-    "imageUrl": "./cards/swy-260725_1-sk.webp",
-    "backImageUrl": "./cards/swy-back.webp"
-  },
-  {
-    "id": "swy-260725_2-hs",
-    "era": "Still With You",
-    "member": "Hyesung",
-    "category": "Event",
-    "name": "260725 2",
-    "imageUrl": "./cards/swy-260725_2-hs.webp",
-    "backImageUrl": "./cards/swy-back.webp"
-  },
-  {
-    "id": "swy-260725_2-sk",
-    "era": "Still With You",
-    "member": "Sungkook",
-    "category": "Event",
-    "name": "260725 2",
-    "imageUrl": "./cards/swy-260725_2-sk.webp",
-    "backImageUrl": "./cards/swy-back.webp"
-  },
-  {
-    "id": "swy-260829_1-hs",
-    "era": "Still With You",
-    "member": "Hyesung",
-    "category": "Event",
-    "name": "260829 1",
-    "imageUrl": "./cards/swy-260829_1-hs.webp",
-    "backImageUrl": "./cards/swy-260829_back.webp"
-  },
-  {
-    "id": "swy-260829_1-sk",
-    "era": "Still With You",
-    "member": "Sungkook",
-    "category": "Event",
-    "name": "260829 1",
-    "imageUrl": "./cards/swy-260829_1-sk.webp",
-    "backImageUrl": "./cards/swy-260829_back.webp"
-  },
-  {
-    "id": "swy-260829_2-hs",
-    "era": "Still With You",
-    "member": "Hyesung",
-    "category": "Event",
-    "name": "260829 2",
-    "imageUrl": "./cards/swy-260829_2-hs.webp",
-    "backImageUrl": "./cards/swy-260829_back.webp"
-  },
-  {
-    "id": "swy-260829_2-sk",
-    "era": "Still With You",
-    "member": "Sungkook",
-    "category": "Event",
-    "name": "260829 2",
-    "imageUrl": "./cards/swy-260829_2-sk.webp",
-    "backImageUrl": "./cards/swy-260829_back.webp"
   },
   {
     "id": "swy-260606_student-hs-1",
@@ -518,6 +410,114 @@
     "category": "Video Call",
     "name": "260607 cafe",
     "imageUrl": "./cards/swy-260607_cafe-sk-8.webp"
+  },
+  {
+    "id": "swy-260712_1-hs",
+    "era": "Still With You",
+    "member": "Hyesung",
+    "category": "Event",
+    "name": "260712 1",
+    "imageUrl": "./cards/swy-260712_1-hs.webp",
+    "backImageUrl": "./cards/swy-back.webp"
+  },
+  {
+    "id": "swy-260712_1-sk",
+    "era": "Still With You",
+    "member": "Sungkook",
+    "category": "Event",
+    "name": "260712 1",
+    "imageUrl": "./cards/swy-260712_1-sk.webp",
+    "backImageUrl": "./cards/swy-back.webp"
+  },
+  {
+    "id": "swy-260712_2-hs",
+    "era": "Still With You",
+    "member": "Hyesung",
+    "category": "Event",
+    "name": "260712 2",
+    "imageUrl": "./cards/swy-260712_2-hs.webp",
+    "backImageUrl": "./cards/swy-back.webp"
+  },
+  {
+    "id": "swy-260712_2-sk",
+    "era": "Still With You",
+    "member": "Sungkook",
+    "category": "Event",
+    "name": "260712 2",
+    "imageUrl": "./cards/swy-260712_2-sk.webp",
+    "backImageUrl": "./cards/swy-back.webp"
+  },
+  {
+    "id": "swy-260725_1-hs",
+    "era": "Still With You",
+    "member": "Hyesung",
+    "category": "Event",
+    "name": "260725 1",
+    "imageUrl": "./cards/swy-260725_1-hs.webp",
+    "backImageUrl": "./cards/swy-back.webp"
+  },
+  {
+    "id": "swy-260725_1-sk",
+    "era": "Still With You",
+    "member": "Sungkook",
+    "category": "Event",
+    "name": "260725 1",
+    "imageUrl": "./cards/swy-260725_1-sk.webp",
+    "backImageUrl": "./cards/swy-back.webp"
+  },
+  {
+    "id": "swy-260725_2-hs",
+    "era": "Still With You",
+    "member": "Hyesung",
+    "category": "Event",
+    "name": "260725 2",
+    "imageUrl": "./cards/swy-260725_2-hs.webp",
+    "backImageUrl": "./cards/swy-back.webp"
+  },
+  {
+    "id": "swy-260725_2-sk",
+    "era": "Still With You",
+    "member": "Sungkook",
+    "category": "Event",
+    "name": "260725 2",
+    "imageUrl": "./cards/swy-260725_2-sk.webp",
+    "backImageUrl": "./cards/swy-back.webp"
+  },
+  {
+    "id": "swy-260829_1-hs",
+    "era": "Still With You",
+    "member": "Hyesung",
+    "category": "Event",
+    "name": "260829 1",
+    "imageUrl": "./cards/swy-260829_1-hs.webp",
+    "backImageUrl": "./cards/swy-260829_back.webp"
+  },
+  {
+    "id": "swy-260829_1-sk",
+    "era": "Still With You",
+    "member": "Sungkook",
+    "category": "Event",
+    "name": "260829 1",
+    "imageUrl": "./cards/swy-260829_1-sk.webp",
+    "backImageUrl": "./cards/swy-260829_back.webp"
+  },
+  {
+    "id": "swy-260829_2-hs",
+    "era": "Still With You",
+    "member": "Hyesung",
+    "category": "Event",
+    "name": "260829 2",
+    "imageUrl": "./cards/swy-260829_2-hs.webp",
+    "backImageUrl": "./cards/swy-260829_back.webp"
+  },
+  {
+    "id": "swy-260829_2-sk",
+    "era": "Still With You",
+    "member": "Sungkook",
+    "category": "Event",
+    "name": "260829 2",
+    "imageUrl": "./cards/swy-260829_2-sk.webp",
+    "backImageUrl": "./cards/swy-260829_back.webp"
   },
   {
     "id": "Caffeine-260910-Taehwan-20",

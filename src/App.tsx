@@ -139,6 +139,11 @@ export default function App() {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [previewCard, setPreviewCard] = useState<Photocard | null>(null);
   const [exportedImageUrl, setExportedImageUrl] = useState<string | null>(null);
+  const [showBack, setShowBack] = useState<boolean>(false);
+
+  useEffect(() => {
+    setShowBack(false);
+  }, [previewCard]);
 
   const [ownedCards, setOwnedCards] = useState<Set<string>>(() => {
     try {
@@ -157,6 +162,8 @@ export default function App() {
       return new Set();
     }
   });
+
+  
 
   useEffect(() => {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
@@ -209,7 +216,7 @@ export default function App() {
     return ['All', ...Array.from(extracted)];
   }, [cards]);
 
-  const eras = useMemo(() => ['All', ...Array.from(new Set(cards.map((c) => c.era).filter(Boolean)))], [cards]);
+  const eras = useMemo(() => ['All', ...Array.from(new Set(cards.map((c) => c.era).filter((e): e is string => Boolean(e))))], [cards]);
   const categories = useMemo(() => {
     const extracted = new Set(cards.map((c) => c.category || (c as any).catagory).filter(Boolean));
     return ['All', ...Array.from(extracted)];
@@ -617,11 +624,11 @@ export default function App() {
 
         </div>
 
-        <div className={`p-3 sm:p-6 rounded-2xl border shadow-sm grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4 content-start transition-colors min-h-[750px] sm:min-h-[920px] ${isDark ? 'bg-neutral-900/60 border-neutral-800' : 'bg-white border-neutral-200'}`}>
+        <div className={`p-3 sm:p-6 rounded-2xl border shadow-sm grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4 content-start transition-colors min-h-[420px] ${isDark ? 'bg-neutral-900/60 border-neutral-800' : 'bg-white border-neutral-200'}`}>
           {loading ? (
-            <div className="col-span-full flex flex-col items-center justify-center py-28 text-neutral-400">
-              <Loader2 className="h-8 w-8 animate-spin text-indigo-500 mb-3" />
-              <p className="text-sm font-semibold">{t.loading}</p>
+            <div className="col-span-full flex flex-col items-center justify-center py-20 gap-3 text-neutral-400">
+              <Loader2 className="h-6 w-6 animate-spin text-indigo-500" />
+              <span className="text-xs font-medium">{t.loading || 'Loading...'}</span>
             </div>
           ) : filteredCards.length === 0 ? (
             <div className="col-span-full rounded-2xl p-12 text-center text-neutral-400 flex items-center justify-center">
@@ -659,6 +666,15 @@ export default function App() {
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-neutral-400 text-xs">
                         {t.noImage}
+                      </div>
+                    )}
+
+                    {card.backImageUrl && (
+                      <div className="absolute bottom-1.5 right-1.5 z-10 flex h-5 w-5 items-center justify-center rounded-md bg-black/60 text-white backdrop-blur-xs border border-white/10 pointer-events-none">
+                        <svg className="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                          <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                        </svg>
                       </div>
                     )}
 
@@ -979,19 +995,27 @@ export default function App() {
             className={`relative flex flex-col items-center max-w-xs w-full border rounded-2xl p-4 shadow-2xl ${isDark ? 'bg-neutral-900 border-neutral-800 text-neutral-100' : 'bg-white border-neutral-200 text-neutral-900'}`}
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              onClick={() => setPreviewCard(null)}
-              className={`absolute right-3 top-3 rounded-full p-1.5 transition ${isDark ? 'text-neutral-400 hover:bg-neutral-800 hover:text-neutral-100' : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'}`}
+            <div 
+              className={`aspect-[55/85] w-full rounded-xl overflow-hidden border shadow-inner mt-2 relative ${previewCard.backImageUrl ? 'cursor-pointer' : ''} ${isDark ? 'border-neutral-800 bg-neutral-950' : 'border-neutral-200 bg-neutral-100'}`}
+              onClick={() => {
+                if (previewCard.backImageUrl) {
+                  setShowBack(!showBack);
+                }
+              }}
             >
-              <X className="h-4 w-4" />
-            </button>
-
-            <div className={`aspect-[55/85] w-full rounded-xl overflow-hidden border shadow-inner mt-2 ${isDark ? 'border-neutral-800 bg-neutral-950' : 'border-neutral-200 bg-neutral-100'}`}>
               <img
-                src={formatImageUrl(previewCard.imageUrl || (previewCard as any).photo)}
+                src={formatImageUrl(showBack && previewCard.backImageUrl ? previewCard.backImageUrl : (previewCard.imageUrl || (previewCard as any).photo))}
                 alt={previewCard.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-300 hover:scale-[1.01]"
               />
+              {previewCard.backImageUrl && (
+                <div className="absolute bottom-2.5 right-2.5 z-10 flex h-6 w-6 items-center justify-center rounded-md bg-black/60 text-white backdrop-blur-xs border border-white/10 pointer-events-none shadow-md">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
+                    <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
+                  </svg>
+                </div>
+              )}
             </div>
 
             <div className="w-full mt-3.5 text-left">
@@ -1010,7 +1034,7 @@ export default function App() {
                 )}
               </div>
 
-              <div className={`mt-4 pt-3 border-t flex gap-2 ${isDark ? 'border-neutral-800' : 'border-neutral-200'}`}>
+              <div className={`mt-4 pt-3 border-t flex gap-2 items-center ${isDark ? 'border-neutral-800' : 'border-neutral-200'}`}>
                 <button
                   onClick={() => toggleHave(previewCard.id)}
                   className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer ${
@@ -1032,6 +1056,17 @@ export default function App() {
                 >
                   <Heart className={`h-4 w-4 ${wantedCards.has(previewCard.id) ? 'fill-current' : ''}`} />
                   <span>{t.want}</span>
+                </button>
+                <button
+                  onClick={() => setPreviewCard(null)}
+                  className={`flex items-center justify-center px-4 py-2 rounded-xl transition active:scale-95 cursor-pointer border ${
+                    isDark
+                      ? 'bg-neutral-800 border-neutral-700 text-neutral-300 hover:bg-neutral-700 hover:text-white'
+                      : 'bg-neutral-200 border-neutral-300 text-neutral-800 hover:bg-neutral-300'
+                  }`}
+                  title="Close"
+                >
+                  <X className="h-4 w-4" />
                 </button>
               </div>
             </div>
