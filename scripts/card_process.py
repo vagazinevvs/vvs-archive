@@ -29,6 +29,50 @@ def four_point_transform(image, pts):
     m = cv2.getPerspectiveTransform(rect, dst)
     return cv2.warpPerspective(image, m, (max_w, max_h))
 
+# def apply_white_balance(bgr_img):
+#     h, w = bgr_img.shape[:2]
+#     corner_h = int(h * 0.12)
+#     corner_w = int(w * 0.12)
+    
+#     corners = {
+#         "tl": bgr_img[0:corner_h, 0:corner_w],
+#         "tr": bgr_img[0:corner_h, w-corner_w:w],
+#         "bl": bgr_img[h-corner_h:h, 0:corner_w],
+#         "br": bgr_img[h-corner_h:h, w-corner_w:w]
+#     }
+    
+#     best_bg = None
+#     max_score = -float('inf')
+    
+#     for key, patch in corners.items():
+#         b_mean = np.mean(patch[:, :, 0])
+#         g_mean = np.mean(patch[:, :, 1])
+#         r_mean = np.mean(patch[:, :, 2])
+        
+#         brightness = (b_mean + g_mean + r_mean) / 3.0
+#         color_std = np.std([b_mean, g_mean, r_mean])
+#         score = brightness - (color_std * 0.5)
+        
+#         if score > max_score:
+#             max_score = score
+#             best_bg = patch
+            
+#     if best_bg is None:
+#         best_bg = corners["tr"]
+        
+#     average_b = np.mean(best_bg[:, :, 0])
+#     average_g = np.mean(best_bg[:, :, 1])
+#     average_r = np.mean(best_bg[:, :, 2])
+#     average = (average_b + average_g + average_r) / 3.0
+    
+#     result = bgr_img.astype(np.float32)
+#     if average_b > 0: result[:, :, 0] *= (average / average_b)
+#     if average_g > 0: result[:, :, 1] *= (average / average_g)
+#     if average_r > 0: result[:, :, 2] *= (average / average_r)
+    
+#     return np.clip(result, 0, 255).astype(np.uint8)
+
+
 def apply_white_balance(bgr_img):
     h, w = bgr_img.shape[:2]
     corner_h = int(h * 0.12)
@@ -41,34 +85,53 @@ def apply_white_balance(bgr_img):
         "br": bgr_img[h-corner_h:h, w-corner_w:w]
     }
     
-    best_bg = None
-    max_score = -float('inf')
-    
+    # Collect all corner patches to evaluate extreme values (either very bright white or very dark black)
+    all_corner_means = []
     for key, patch in corners.items():
         b_mean = np.mean(patch[:, :, 0])
         g_mean = np.mean(patch[:, :, 1])
         r_mean = np.mean(patch[:, :, 2])
-        
         brightness = (b_mean + g_mean + r_mean) / 3.0
-        color_std = np.std([b_mean, g_mean, r_mean])
-        score = brightness - (color_std * 0.5)
+        all_corner_means.append(brightness)
         
-        if score > max_score:
-            max_score = score
-            best_bg = patch
-            
+    # Determine if the background is predominantly white or black based on extremes
+    median_brightness = np.median(all_corner_means)
+    target_is_white = median_brightness > 127.5
+    
+    best_bg = None
+    if target_is_white:
+        # Pick the corner with the highest brightness (whitest)
+        max_score = -float('inf')
+        for key, patch in corners.items():
+            brightness = np.mean(patch)
+            if brightness > max_score:
+                max_score = brightness
+                best_bg = patch
+    else:
+        # Pick the corner with the lowest brightness (blackest)
+        min_score = float('inf')
+        for key, patch in corners.items():
+            brightness = np.mean(patch)
+            if brightness < min_score:
+                min_score = brightness
+                best_bg = patch
+                
     if best_bg is None:
         best_bg = corners["tr"]
         
     average_b = np.mean(best_bg[:, :, 0])
     average_g = np.mean(best_bg[:, :, 1])
     average_r = np.mean(best_bg[:, :, 2])
-    average = (average_b + average_g + average_r) / 3.0
     
     result = bgr_img.astype(np.float32)
-    if average_b > 0: result[:, :, 0] *= (average / average_b)
-    if average_g > 0: result[:, :, 1] *= (average / average_g)
-    if average_r > 0: result[:, :, 2] *= (average / average_r)
+    if target_is_white:
+        average = (average_b + average_g + average_r) / 3.0
+        if average_b > 0: result[:, :, 0] *= (average / average_b)
+        if average_g > 0: result[:, :, 1] *= (average / average_g)
+        if average_r > 0: result[:, :, 1] *= (average / average_r) # Fixed typo bounds
+    else:
+        # For black balance/normalization if needed, keep channels balanced relative to background floor
+        pass
     
     return np.clip(result, 0, 255).astype(np.uint8)
 

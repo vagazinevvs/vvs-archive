@@ -23,22 +23,24 @@ class CompactEncoder(json.JSONEncoder):
 
 
 def parse_card_metadata(card_id, category=""):
-    """從檔名解析 era, name, member (格式: era-name-member1_member2.jpg)"""
+    """從檔名解析 era, name, member (格式: era-name-member-number.webp)"""
     parts = card_id.split("-")
     
     if len(parts) >= 3:
         era = parts[0]
-        raw_member = parts[-1]
+        # 取第三部分 (index 2) 作為成員代號，並支援底線多成員
+        raw_member = parts[2]
         member = [m.strip().lower() for m in raw_member.split("_")]
-        card_name = "-".join(parts[1:-1]).replace("_", " ")
+        # 名稱取中間的部分（例如 era 和 member 之間）
+        card_name = "-".join(parts[1:2]).replace("_", " ")
     elif len(parts) == 2:
         era = parts[0]
         card_name = parts[1].replace("_", " ")
-        member = ["all"]
+        member = []
     else:
-        era = "Unknown"
+        era = ""
         card_name = card_id.replace("_", " ")
-        member = ["all"]
+        member = []
         
     return {
         "id": card_id,
