@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Sun,
   Moon,
+  ArrowUpDown,
 } from 'lucide-react';
 import type { Photocard } from './types/card';
 import {
@@ -30,7 +31,7 @@ import {
 const STORAGE_KEY_OWNED = 'vanner_collected_cards';
 const STORAGE_KEY_WANTED = 'vanner_wanted_cards';
 const SUBMISSION_FORM_URL = import.meta.env.VITE_FORM_URL || 'https://forms.gle/iTWDSb1ddmCRPBiV7';
-const CARDS_PER_PAGE = 20;
+const CARDS_PER_PAGE = 30;
 
 interface SocialLinkItem {
   label: string;
@@ -102,18 +103,14 @@ const formatImageUrl = (url?: string): string => {
     return `https://wsrv.nl/?url=${encodeURIComponent(url)}`;
   }
 
-
-  if (url.includes('twimg.com') || url.includes('twitter.com')) {
-    return `https://wsrv.nl/?url=${encodeURIComponent(url)}`;
-  }
-
   return url;
 };
 
 export default function App() {
   const [cards, setCards] = useState<Photocard[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest'>('newest');
+  const [showBothLabeled, setShowBothLabeled] = useState<boolean>(false);
   const [isDark, setIsDark] = useState<boolean>(() => {
     return localStorage.getItem('theme') !== 'light';
   });
@@ -263,9 +260,10 @@ export default function App() {
     }
   };
 
-  const filteredCards = useMemo(() => {
+  // Base filtered list based on metadata filters (Member, Era, Category, Search Query) - ignoring showBothLabeled for stats calculation
+  const baseFilteredCards = useMemo(() => {
     const query = searchQuery.trim().toLowerCase();
-    return cards.filter((card) => {
+    const filtered = cards.filter((card) => {
       const cardMembers = parseMembers(card.member);
       const cardCat = card.category || (card as any).catagory || '';
 
@@ -284,11 +282,42 @@ export default function App() {
 
       return matchMember && matchEra && matchCat && matchSearch;
     });
-  }, [cards, selectedMembers, selectedEra, selectedCategory, searchQuery, currentLang]);
+
+    return filtered.sort((a, b) => {
+      if (sortOrder === 'newest') {
+        return cards.indexOf(b) - cards.indexOf(a);
+      } else {
+        return cards.indexOf(a) - cards.indexOf(b);
+      }
+    });
+  }, [cards, selectedMembers, selectedEra, selectedCategory, searchQuery, currentLang, sortOrder]);
+
+  const filteredStats = useMemo(() => {
+    let haveCount = 0;
+    let wantCount = 0;
+    baseFilteredCards.forEach((card) => {
+      if (ownedCards.has(card.id)) haveCount++;
+      if (wantedCards.has(card.id)) wantCount++;
+    });
+    return {
+      have: haveCount,
+      want: wantCount,
+      total: baseFilteredCards.length,
+    };
+  }, [baseFilteredCards, ownedCards, wantedCards]);
+
+  // Final displayed cards after applying showBothLabeled filter
+  const filteredCards = useMemo(() => {
+    return baseFilteredCards.filter((card) => {
+      const matchBothLabeled =
+        !showBothLabeled || (ownedCards.has(card.id) || wantedCards.has(card.id));
+      return matchBothLabeled;
+    });
+  }, [baseFilteredCards, showBothLabeled, ownedCards, wantedCards]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, selectedEra, selectedCategory]);
+  }, [searchQuery, selectedEra, selectedCategory, showBothLabeled]);
 
   const totalPages = Math.ceil(filteredCards.length / CARDS_PER_PAGE) || 1;
 
@@ -297,24 +326,24 @@ export default function App() {
     return filteredCards.slice(start, start + CARDS_PER_PAGE);
   }, [filteredCards, currentPage]);
 
-  const filteredStats = useMemo(() => {
-    let haveCount = 0;
-    let wantCount = 0;
-    filteredCards.forEach((card) => {
-      if (ownedCards.has(card.id)) haveCount++;
-      if (wantedCards.has(card.id)) wantCount++;
-    });
-    return {
-      have: haveCount,
-      want: wantCount,
-      total: filteredCards.length,
-    };
-  }, [filteredCards, ownedCards, wantedCards]);
-
   const handleExport = async () => {
     if (!templateRef.current) return;
     setIsExporting(true);
     try {
+      // Ensure all images in the hidden template are fully loaded before capturing
+      const images = Array.from(templateRef.current.querySelectorAll('img'));
+      await Promise.all(
+        images.map((img) => {
+          if (img.complete && img.naturalHeight !== 0) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.onload = resolve;
+            img.onerror = resolve;
+            // Timeout fallback after 3 seconds in case an image fails
+            setTimeout(resolve, 3000);
+          });
+        })
+      );
+
       const dataUrl = await toJpeg(templateRef.current, {
         cacheBust: true,
         pixelRatio: 1.5,
@@ -328,7 +357,7 @@ export default function App() {
         setExportedImageUrl(dataUrl);
       } else {
         const link = document.createElement('a');
-        link.download = `vvs-archive-${new Date().toISOString().slice(0, 10)}.jpg`;
+        link.download = `vvs-archive-page-${currentPage}-${new Date().toISOString().slice(0, 10)}.jpg`;
         link.href = dataUrl;
         link.click();
       }
@@ -353,7 +382,6 @@ export default function App() {
     </button>
   );
 
- 
   return (
     <div className={`min-h-screen w-full ${isDark ? 'bg-neutral-950 text-neutral-100' : 'bg-neutral-50 text-neutral-900'} pb-16 selection:bg-indigo-500 selection:text-white flex flex-col items-center transition-colors`}>
       <header className={`sticky top-0 z-30 w-full ${isDark ? 'bg-neutral-950/90 border-neutral-800/80' : 'bg-white/90 border-neutral-200'} backdrop-blur-md border-b px-3 sm:px-8 py-3 shadow-md transition-colors`}>
@@ -388,19 +416,44 @@ export default function App() {
           </div>
           
           <div className="flex items-center justify-between gap-2 pt-2 border-t border-neutral-200/60 dark:border-neutral-800/80">
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <button
+                onClick={() => setSortOrder((prev) => (prev === 'newest' ? 'oldest' : 'newest'))}
+                className={`p-2 rounded-xl border transition cursor-pointer flex items-center justify-center ${
+                  sortOrder === 'oldest'
+                    ? isDark ? 'bg-neutral-700 border-neutral-600 text-neutral-100 shadow-xs' : 'bg-neutral-800 border-neutral-700 text-white shadow-xs'
+                    : isDark 
+                      ? 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800' 
+                      : 'bg-white border-neutral-200 text-neutral-600 hover:text-black hover:bg-neutral-100'
+                }`}
+                title={`Sort: ${sortOrder}`}
+              >
+                <ArrowUpDown className="h-4 w-4" />
+              </button>
+            </div>
 
             <div className="flex items-center gap-2">
-              <div className={`flex items-center gap-1.5 border px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold ${isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-neutral-200 shadow-xs'}`}>
+              <div
+                onClick={() => setShowBothLabeled(!showBothLabeled)}
+                className={`flex items-center gap-1.5 border px-3 py-1.5 rounded-full text-[11px] sm:text-xs font-semibold cursor-pointer transition-colors ${
+                  showBothLabeled
+                    ? isDark ? 'bg-neutral-800 border-neutral-600 text-neutral-100 shadow-sm' : 'bg-neutral-200 border-neutral-400 text-neutral-900 shadow-sm'
+                    : isDark ? 'bg-neutral-900 border-neutral-800 text-neutral-300' : 'bg-white border-neutral-200 text-neutral-700 shadow-xs'
+                }`}
+                title="Toggle filter for labeled cards"
+              >
                 <span className="flex items-center gap-1 text-indigo-500">
-                  <Check className="h-3 w-3 stroke-[3]" /> Have: {filteredStats.have}
+                  <Check className="h-3 w-3 stroke-[3]" /> {filteredStats.have}
                 </span>
                 <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>|</span>
                 <span className="flex items-center gap-1 text-rose-500">
-                  <Heart className="h-3 w-3 fill-current" /> Want: {filteredStats.want}
+                  <Heart className="h-3 w-3 fill-current" /> {filteredStats.want}
                 </span>
                 <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>/</span>
-                <span className="text-neutral-500 font-medium">{filteredStats.total}</span>
+                <span className="font-medium">
+                  {filteredStats.total}
+                </span>
               </div>
 
               <button
@@ -417,19 +470,37 @@ export default function App() {
 
       <main className="max-w-7xl w-full mx-auto px-3 sm:px-8 pt-4 sm:pt-6">
         <div className={`backdrop-blur-sm p-3.5 sm:p-5 rounded-2xl border shadow-sm mb-6 flex flex-col gap-3 transition-colors ${isDark ? 'bg-neutral-900/70 border-neutral-800/90' : 'bg-white/80 border-neutral-200'}`}>
-          <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-            <input
-              type="text"
-              placeholder={t.searchPlaceholder}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={`w-full rounded-xl border py-2 pl-9 pr-4 text-xs sm:text-sm transition focus:outline-none focus:ring-1 focus:ring-indigo-500/30 ${
-                isDark 
-                  ? 'border-neutral-800 bg-neutral-950/60 text-neutral-100 placeholder-neutral-500 focus:border-indigo-500 focus:bg-neutral-950' 
-                  : 'border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-400 focus:border-indigo-500 focus:bg-white'
-              }`}
-            />
+          
+          <div className="flex items-center gap-2 w-full">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+              <input
+                type="text"
+                placeholder={t.searchPlaceholder}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={`w-full rounded-xl border py-2 pl-9 pr-4 text-xs sm:text-sm transition focus:outline-none focus:ring-1 focus:ring-indigo-500/30 ${
+                  isDark 
+                    ? 'border-neutral-800 bg-neutral-950/60 text-neutral-100 placeholder-neutral-500 focus:border-indigo-500 focus:bg-neutral-950' 
+                    : 'border-neutral-200 bg-neutral-50 text-neutral-900 placeholder-neutral-400 focus:border-indigo-500 focus:bg-white'
+                }`}
+              />
+            </div>
+
+            {(!selectedMembers.has('All') || selectedEra !== 'All' || selectedCategory !== 'All' || searchQuery.trim() !== '') && (
+              <button
+                onClick={() => {
+                  setSelectedMembers(new Set(['All']));
+                  setSelectedEra('All');
+                  setSelectedCategory('All');
+                  setSearchQuery('');
+                }}
+                className={`inline-flex items-center justify-center p-2 rounded-xl text-xs font-semibold transition cursor-pointer shrink-0 ${isDark ? 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300' : 'bg-neutral-200 hover:bg-neutral-300 text-neutral-700'}`}
+                title="Clear Filters"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-2 flex-wrap text-xs">
@@ -448,17 +519,17 @@ export default function App() {
                       : isDark ? 'bg-neutral-800/80 text-neutral-300 hover:bg-neutral-700/80 hover:text-white' : 'bg-neutral-200 text-neutral-700 hover:bg-neutral-300 hover:text-black';
                   }
                   const name = memberKey.toLowerCase();
-                  if (name.includes('taehwan') || name.includes('泰煥') || name.includes('고태운')) {
+                  if (name.includes('taehwan') || name.includes('泰煥') || name.includes('고태운') || name.includes('테환')) {
                     return active
                       ? 'bg-red-600 text-white shadow-xs shadow-red-600/30'
                       : isDark ? 'bg-red-950/40 border border-red-900/60 text-red-300 hover:bg-red-900/50 hover:text-white' : 'bg-red-50 border border-red-200 text-red-700 hover:bg-red-100';
                   }
-                  if (name.includes('hyesung') || name.includes('慧成') || name.includes('박혜성')) {
+                  if (name.includes('hyesung') || name.includes('慧成') || name.includes('혜성')) {
                     return active
                       ? 'bg-amber-600 text-white shadow-xs shadow-amber-600/30'
                       : isDark ? 'bg-amber-950/40 border border-amber-900/60 text-amber-300 hover:bg-amber-900/50 hover:text-white' : 'bg-amber-50 border border-amber-200 text-amber-700 hover:bg-amber-100';
                   }
-                  if (name.includes('sungkook') || name.includes('成國')) {
+                  if (name.includes('sungkook') || name.includes('成國') || name.includes('성국')) {
                     return active
                       ? 'bg-purple-600 text-white shadow-xs shadow-purple-600/30'
                       : isDark ? 'bg-purple-950/40 border border-purple-900/60 text-purple-300 hover:bg-purple-900/50 hover:text-white' : 'bg-purple-50 border border-purple-200 text-purple-700 hover:bg-purple-100';
@@ -523,22 +594,6 @@ export default function App() {
             </div>
           )}
 
-          {(!selectedMembers.has('All') || selectedEra !== 'All' || selectedCategory !== 'All' || searchQuery.trim() !== '') && (
-            <div className={`flex justify-end pt-2 border-t ${isDark ? 'border-neutral-800/80' : 'border-neutral-200'}`}>
-              <button
-                onClick={() => {
-                  setSelectedMembers(new Set(['All']));
-                  setSelectedEra('All');
-                  setSelectedCategory('All');
-                  setSearchQuery('');
-                }}
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-semibold transition cursor-pointer ${isDark ? 'bg-neutral-800 hover:bg-neutral-700 text-neutral-300' : 'bg-neutral-200 hover:bg-neutral-300 text-neutral-700'}`}
-              >
-                <X className="h-3.5 w-3.5" />
-                <span>Clear Filters</span>
-              </button>
-            </div>
-          )}
         </div>
 
         {loading ? (
@@ -552,7 +607,7 @@ export default function App() {
           </div>
         ) : (
           <>
-            <div className={`p-3 sm:p-6 rounded-2xl border shadow-sm grid grid-cols-2 sm:grid-cols-5 gap-2.5 sm:gap-4 transition-colors ${isDark ? 'bg-neutral-900/60 border-neutral-800' : 'bg-white border-neutral-200'}`}>
+            <div className={`p-3 sm:p-6 rounded-2xl border shadow-sm grid grid-cols-3 sm:grid-cols-5 gap-2 sm:gap-4 transition-colors ${isDark ? 'bg-neutral-900/60 border-neutral-800' : 'bg-white border-neutral-200'}`}>
               {paginatedCards.map((card) => {
                 const isOwned = ownedCards.has(card.id);
                 const isWanted = wantedCards.has(card.id);
@@ -594,13 +649,13 @@ export default function App() {
                           e.stopPropagation();
                           toggleHave(card.id);
                         }}
-                        className={`absolute top-2 left-2 z-10 flex h-7 w-7 items-center justify-center rounded-full transition-all active:scale-90 cursor-pointer ${
+                        className={`absolute top-1.5 left-1.5 sm:top-2 sm:left-2 z-10 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full transition-all active:scale-90 cursor-pointer ${
                           isOwned
                             ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/50 scale-105'
                             : 'bg-black/60 text-neutral-300 hover:text-white hover:bg-black/80 backdrop-blur-xs border border-white/10'
                         }`}
                       >
-                        <Check className="h-4 w-4 stroke-[3]" />
+                        <Check className="h-3.5 w-3.5 sm:h-4 sm:w-4 stroke-[3]" />
                       </button>
 
                       <button
@@ -610,18 +665,18 @@ export default function App() {
                           e.stopPropagation();
                           toggleWant(card.id);
                         }}
-                        className={`absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full transition-all active:scale-90 cursor-pointer ${
+                        className={`absolute top-1.5 right-1.5 sm:top-2 sm:right-2 z-10 flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full transition-all active:scale-90 cursor-pointer ${
                           isWanted
                             ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/50 scale-105'
                             : 'bg-black/60 text-neutral-300 hover:text-rose-400 hover:bg-black/80 backdrop-blur-xs border border-white/10'
                         }`}
                       >
-                        <Heart className={`h-4 w-4 ${isWanted ? 'fill-current' : ''}`} />
+                        <Heart className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${isWanted ? 'fill-current' : ''}`} />
                       </button>
                     </div>
 
                     <div
-                      className={`p-2 sm:p-2.5 flex flex-col flex-1 justify-between transition-colors ${
+                      className={`p-1.5 sm:p-2.5 flex flex-col flex-1 justify-between transition-colors ${
                         isOwned
                           ? isDark ? 'bg-indigo-950/30 border-t border-indigo-900/50' : 'bg-indigo-50 border-t border-indigo-100'
                           : isWanted
@@ -630,7 +685,7 @@ export default function App() {
                       }`}
                     >
                       <p
-                        className={`text-xs font-bold truncate ${
+                        className={`text-[11px] sm:text-xs font-bold truncate ${
                           isOwned
                             ? isDark ? 'text-indigo-200' : 'text-indigo-900'
                             : isWanted
@@ -641,11 +696,11 @@ export default function App() {
                       >
                         {card.name}
                       </p>
-                      <div className="flex justify-between items-center text-[10px] text-neutral-500 mt-1">
+                      <div className="flex justify-between items-center text-[9px] sm:text-[10px] text-neutral-500 mt-0.5 sm:mt-1">
                         <span className="truncate pr-1 font-medium">{displayMember}</span>
                         {cardCat && (
                           <span
-                            className={`shrink-0 px-1.5 py-0.5 rounded font-medium ${
+                            className={`shrink-0 px-1 py-0.2 sm:px-1.5 sm:py-0.5 rounded font-medium ${
                               isOwned
                                 ? isDark ? 'bg-indigo-950 text-indigo-300 border border-indigo-800/60' : 'bg-indigo-100 text-indigo-800 border border-indigo-200'
                                 : isWanted
@@ -677,7 +732,7 @@ export default function App() {
                   <ChevronLeft className="h-4 w-4" />
                 </button>
                 <span className="text-xs font-semibold text-neutral-400">
-                  Page {currentPage} of {totalPages}
+                  {currentPage} / {totalPages}
                 </span>
                 <button
                   onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
@@ -704,7 +759,7 @@ export default function App() {
           <div className={`flex items-center justify-between border-b pb-4 px-1 ${isDark ? 'border-neutral-800' : 'border-neutral-200'}`}>
             <div className="flex flex-col gap-1">
               <h2 className="text-base font-black tracking-wider uppercase">
-                {t.title} - CHECKLIST
+              {t.title} - CHECKLIST {totalPages > 1 && `(${currentPage}/${totalPages})`}
               </h2>
               <div className="flex items-center gap-2 text-xs text-neutral-500 font-medium">
                 <span>
@@ -719,19 +774,19 @@ export default function App() {
             </div>
             <div className={`flex items-center gap-2 border px-4 py-2 rounded-full text-xs font-semibold ${isDark ? 'bg-neutral-950 border-neutral-800' : 'bg-neutral-100 border-neutral-200'}`}>
               <span className="flex items-center gap-1 text-indigo-500">
-                <Check className="h-3.5 w-3.5 stroke-[3]" /> Have: {filteredStats.have}
+                <Check className="h-3.5 w-3.5 stroke-[3]" /> Have: {paginatedCards.filter(c => ownedCards.has(c.id)).length}
               </span>
               <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>|</span>
               <span className="flex items-center gap-1 text-rose-500">
-                <Heart className="h-3.5 w-3.5 fill-current" /> Want: {filteredStats.want}
+                <Heart className="h-3.5 w-3.5 fill-current" /> Want: {paginatedCards.filter(c => wantedCards.has(c.id)).length}
               </span>
               <span className={isDark ? 'text-neutral-700' : 'text-neutral-300'}>/</span>
-              <span className="font-medium">{filteredStats.total}</span>
+              <span className="font-medium">{paginatedCards.length}</span>
             </div>
           </div>
 
           <div className="grid grid-cols-5 gap-4">
-            {filteredCards.map((card) => {
+            {paginatedCards.map((card) => {
               const isOwned = ownedCards.has(card.id);
               const isWanted = wantedCards.has(card.id);
               const imgSrc = formatImageUrl(card.imageUrl || (card as any).photo);
