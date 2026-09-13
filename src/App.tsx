@@ -807,16 +807,20 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-5 gap-4">
-            {paginatedCards.map((card) => {
+            {paginatedCards.map((card, index) => {
               const isOwned = ownedCards.has(card.id);
               const isWanted = wantedCards.has(card.id);
-              const imgSrc = formatImageUrl(card.imageUrl || (card as any).photo, 300);
+              // 確保這裡使用獨立且對應當前卡片的圖片來源
+              const rawImgUrl = card.imageUrl || (card as any).photo;
+              const exportImgSrc = rawImgUrl?.startsWith('./') || rawImgUrl?.startsWith('cards/') 
+                ? `${window.location.origin}${import.meta.env.BASE_URL}${rawImgUrl.replace(/^\.\/?/, '')}`
+                : rawImgUrl;
               const cardCat = card.category || (card as any).catagory;
               const displayMember = formatMultiMemberString(card.member, currentLang);
 
               return (
                 <div
-                  key={`export-${card.id}`}
+                  key={`export-${currentPage}-${card.id}-${index}`}
                   className={`flex flex-col rounded-xl overflow-hidden ${
                     isOwned
                       ? 'border-2 border-indigo-500 ring-4 ring-indigo-500/25'
@@ -826,11 +830,10 @@ export default function App() {
                   }`}
                 >
                   <div className={`aspect-[55/85] w-full relative overflow-hidden ${isDark ? 'bg-neutral-950' : 'bg-neutral-100'}`}>
-                    {imgSrc && (
+                    {exportImgSrc && (
                       <img
-                        src={imgSrc}
+                        src={exportImgSrc}
                         alt={card.name}
-                        crossOrigin="anonymous"
                         className="w-full h-full object-cover"
                       />
                     )}
