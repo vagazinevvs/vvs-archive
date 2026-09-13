@@ -566,5 +566,13 @@
     "category": "Video Call",
     "name": "260607 cafe",
     "imageUrl": "./cards/swy-260607_cafe-sk-8.webp"
+  },
+  {
+    "id": "Caffeine-260910-Taehwan-20",
+    "era": "Caffeine",
+    "member": "Taehwan",
+    "category": "Event",
+    "name": 260910,
+    "imageUrl": "./cards/Caffeine-260910-Taehwan-20.webp"
   }
 ]
