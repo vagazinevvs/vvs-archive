@@ -141,10 +141,12 @@ export default function App() {
   const [previewCard, setPreviewCard] = useState<Photocard | null>(null);
   const [exportedImageUrl, setExportedImageUrl] = useState<string | null>(null);
   const [showBack, setShowBack] = useState<boolean>(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    setShowBack(false);
-  }, [previewCard]);
+  // useEffect(() => {
+  //   setShowBack(false);
+  // }, [previewCard]);
+
 
   const [ownedCards, setOwnedCards] = useState<Set<string>>(() => {
     try {
@@ -164,6 +166,7 @@ export default function App() {
     }
   });
 
+  
   
 
   useEffect(() => {
@@ -294,11 +297,16 @@ export default function App() {
       const matchCat = selectedCategory === 'All' || cardCat === selectedCategory;
 
       const localizedMember = formatMultiMemberString(card.member, currentLang).toLowerCase();
+      // const matchSearch =
+      //   !query ||
+      //   card.name.toLowerCase().includes(query) ||
+      //   card.id.toLowerCase().includes(query) ||
+      //   localizedMember.includes(query);
       const matchSearch =
-        !query ||
-        card.name.toLowerCase().includes(query) ||
-        card.id.toLowerCase().includes(query) ||
-        localizedMember.includes(query);
+      !query ||
+      (typeof card.name === 'string' && card.name.toLowerCase().includes(query)) ||
+      (typeof card.id === 'string' && card.id.toLowerCase().includes(query)) ||
+      (typeof localizedMember === 'string' && localizedMember.includes(query));
 
       return matchMember && matchEra && matchCat && matchSearch;
     });
@@ -413,6 +421,93 @@ export default function App() {
     </button>
   );
 
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
+
+      if (e.key === '/') {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        return;
+      }
+
+      if (isInput) return;
+
+      if (e.key === 'Escape') {
+        if (target === searchInputRef.current) {
+          searchInputRef.current?.blur();
+          return;
+        }
+        if (previewCard) setPreviewCard(null);
+        return;
+      }
+
+      if (previewCard) {
+        const currentIndex = filteredCards.findIndex(c => c.id === previewCard.id);
+        if (e.key === 'ArrowLeft' && currentIndex > 0) {
+          setPreviewCard(filteredCards[currentIndex - 1]);
+          setShowBack(false);
+        } else if (e.key === 'ArrowRight' && currentIndex < filteredCards.length - 1) {
+          setPreviewCard(filteredCards[currentIndex + 1]);
+          setShowBack(false);
+        } else if (e.key === ' ' || e.code === 'Space') {
+          // Prevent default page scrolling and toggle card back
+          e.preventDefault();
+          if (previewCard.backImageUrl) {
+            setShowBack(prev => !prev);
+          }
+        } else if (e.key.toLowerCase() === 'o') {
+          toggleHave(previewCard.id);
+        } else if (e.key.toLowerCase() === 'l') {
+          toggleWant(previewCard.id);
+        }
+      } else {
+        if (e.key === 'ArrowLeft' && currentPage > 1) {
+          setCurrentPage(prev => prev - 1);
+        } else if (e.key === 'ArrowRight' && currentPage < totalPages) {
+          setCurrentPage(prev => prev + 1);
+        } else if (e.key.toLowerCase() === 'c') {
+          setSearchQuery('');
+          setSelectedMembers(new Set(['All']));
+          setSelectedEra('All');
+          setSelectedCategory('All');
+        } else if (e.key.toLowerCase() === 't') {
+          setSelectedMembers(prev => {
+            const next = new Set(prev);
+            if (next.has('taehwan')) next.delete('taehwan');
+            else next.add('taehwan');
+            return next;
+          });
+        } else if (e.key.toLowerCase() === 'h') {
+          setSelectedMembers(prev => {
+            const next = new Set(prev);
+            if (next.has('hyesung')) next.delete('hyesung');
+            else next.add('hyesung');
+            return next;
+          });
+        } else if (e.key.toLowerCase() === 's') {
+          setSelectedMembers(prev => {
+            const next = new Set(prev);
+            if (next.has('sungkook')) next.delete('sungkook');
+            else next.add('sungkook');
+            return next;
+          });
+        } else if (e.key.toLowerCase() === 'q') {
+          if (typeof handleExport === 'function') handleExport();
+        } else if (e.key.toLowerCase() === 'n') {
+          setSortOrder(prev => (prev === 'newest' ? 'oldest' : 'newest'));
+        } else if (e.key.toLowerCase() === 'd') {
+          setIsDark(prev => !prev);
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [previewCard, filteredCards, currentPage, totalPages, selectedMembers]);
+
   return (
     <div className={`min-h-screen w-full ${isDark ? 'bg-neutral-950 text-neutral-100' : 'bg-neutral-50 text-neutral-900'} pb-16 selection:bg-indigo-500 selection:text-white flex flex-col items-center transition-colors`}>
       <header className={`sticky top-0 z-30 w-full ${isDark ? 'bg-neutral-950/90 border-neutral-800/80' : 'bg-white/90 border-neutral-200'} backdrop-blur-md border-b px-3 sm:px-8 py-3 shadow-md transition-colors`}>
@@ -504,10 +599,11 @@ export default function App() {
             <div className="relative flex-1">
               <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
               <input
+                ref={searchInputRef}
                 type="text"
-                placeholder={t.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t.searchPlaceholder}
                 className={`w-full rounded-xl border py-2 pl-9 pr-4 text-xs sm:text-sm transition focus:outline-none focus:ring-1 focus:ring-indigo-500/30 ${
                   isDark 
                     ? 'border-neutral-800 bg-neutral-950/60 text-neutral-100 placeholder-neutral-500 focus:border-indigo-500 focus:bg-neutral-950' 
