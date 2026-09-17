@@ -29,6 +29,7 @@ jobs:
       - name: Build frontend
         env:
           VITE_FORM_URL: ${{ secrets.FORM_ID }}
+          VITE_GA_TRACKING_ID: ${{ secrets.VITE_GA_TRACKING_ID }}
         run: npm run build
 
       - name: Setup Pages

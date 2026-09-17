@@ -48,6 +48,9 @@ jobs:
           node-version: '20'
 
       - name: Install Node dependencies and Build
+        env:
+          VITE_GA_TRACKING_ID: ${{ secrets.VITE_GA_TRACKING_ID }}  
+          VITE_FORM_URL: ${{ secrets.FORM_ID }}
         run: |
           npm install
           npm run build
