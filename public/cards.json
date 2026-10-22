@@ -648,15 +648,6 @@
     "backImageUrl": "./cards/Caffeine-260910-Taehwan-21.webp"
   },
   {
-    "id": "Caffeine-260910-Taehwan-21",
-    "era": "caf",
-    "member": "back",
-    "category": "Event",
-    "name": 260910,
-    "imageUrl": "./cards/Caffeine-260910-Taehwan-21.webp",
-    "backImageUrl": ""
-  },
-  {
     "id": "swy-261017_1-hs",
     "era": "Still With You",
     "member": "Hyesung",
