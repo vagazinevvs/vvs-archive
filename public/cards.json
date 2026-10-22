@@ -3,22 +3,28 @@
     "id": "profile_th",
     "era": "other",
     "member": "Taehwan",
+    "category": "",
     "name": "profile_th",
-    "imageUrl": "./cards/profile_th.jpg"
+    "imageUrl": "./cards/profile_th.jpg",
+    "backImageUrl": ""
   },
   {
     "id": "profile_hs",
     "era": "other",
     "member": "Hyesung",
+    "category": "",
     "name": "profile_hs",
-    "imageUrl": "./cards/profile_hs.webp"
+    "imageUrl": "./cards/profile_hs.webp",
+    "backImageUrl": ""
   },
   {
     "id": "profile_sk",
     "era": "other",
     "member": "Sungkook",
+    "category": "",
     "name": "profile_sk",
-    "imageUrl": "./cards/profile_sk.webp"
+    "imageUrl": "./cards/profile_sk.webp",
+    "backImageUrl": ""
   },
   {
     "id": "other-2025_bday_A-sk-4",
@@ -30,6 +36,15 @@
     "backImageUrl": "./cards/other-2025_bday_A_back-sk-5.webp"
   },
   {
+    "id": "other-2025_bday_A_back-sk-5",
+    "era": "other",
+    "member": "back",
+    "category": "Event",
+    "name": "2025 bday A back",
+    "imageUrl": "./cards/other-2025_bday_A_back-sk-5.webp",
+    "backImageUrl": ""
+  },
+  {
     "id": "other-2025_bday_B-sk-2",
     "era": "other",
     "member": "Sungkook",
@@ -37,6 +52,15 @@
     "name": "2025 bday B",
     "imageUrl": "./cards/other-2025_bday_B-sk-2.webp",
     "backImageUrl": "./cards/other-2025_bday_B_back-sk-3.webp"
+  },
+  {
+    "id": "other-2025_bday_B_back-sk-3",
+    "era": "other",
+    "member": "back",
+    "category": "Event",
+    "name": "2025 bday B back",
+    "imageUrl": "./cards/other-2025_bday_B_back-sk-3.webp",
+    "backImageUrl": ""
   },
   {
     "id": "other-2025_bday_C-sk",
@@ -48,6 +72,15 @@
     "backImageUrl": "./cards/other-2025_bday_C_back-sk-1.webp"
   },
   {
+    "id": "other-2025_bday_C_back-sk-1",
+    "era": "other",
+    "member": "back",
+    "category": "Event",
+    "name": "2025 bday C back",
+    "imageUrl": "./cards/other-2025_bday_C_back-sk-1.webp",
+    "backImageUrl": ""
+  },
+  {
     "id": "other-2025_A-Sungkook-14",
     "era": "other",
     "member": "Sungkook",
@@ -55,6 +88,15 @@
     "name": "2025 A",
     "imageUrl": "./cards/other-2025_A-Sungkook-14.webp",
     "backImageUrl": "./cards/other-2025_A_back-Sungkook-15.webp"
+  },
+  {
+    "id": "other-2025_A_back-Sungkook-15",
+    "era": "other",
+    "member": "back",
+    "category": "Snapism",
+    "name": "2025 A back",
+    "imageUrl": "./cards/other-2025_A_back-Sungkook-15.webp",
+    "backImageUrl": ""
   },
   {
     "id": "other-2025_B-Sungkook-16",
@@ -66,6 +108,15 @@
     "backImageUrl": "./cards/other-2025_B_back-Sungkook-17.webp"
   },
   {
+    "id": "other-2025_B_back-Sungkook-17",
+    "era": "other",
+    "member": "back",
+    "category": "Snapism",
+    "name": "2025 B back",
+    "imageUrl": "./cards/other-2025_B_back-Sungkook-17.webp",
+    "backImageUrl": ""
+  },
+  {
     "id": "other-2026_bday_A-Hyesung-13",
     "era": "other",
     "member": "Hyesung",
@@ -75,6 +126,15 @@
     "backImageUrl": "./cards/other-2026_bday_A_back-Hyesung-18.webp"
   },
   {
+    "id": "other-2026_bday_A_back-Hyesung-18",
+    "era": "other",
+    "member": "back",
+    "category": "Snapism",
+    "name": "2026 bday A back",
+    "imageUrl": "./cards/other-2026_bday_A_back-Hyesung-18.webp",
+    "backImageUrl": ""
+  },
+  {
     "id": "other-2026_bday_B-Hyesung-12",
     "era": "other",
     "member": "Hyesung",
@@ -82,6 +142,15 @@
     "name": "2026 bday B",
     "imageUrl": "./cards/other-2026_bday_B-Hyesung-12.webp",
     "backImageUrl": "./cards/other-2026_bday_B_back-Hyesung-19.webp"
+  },
+  {
+    "id": "other-2026_bday_B_back-Hyesung-19",
+    "era": "other",
+    "member": "back",
+    "category": "Snapism",
+    "name": "2026 bday B back",
+    "imageUrl": "./cards/other-2026_bday_B_back-Hyesung-19.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260510_1-hs",
@@ -264,12 +333,31 @@
     "backImageUrl": "./cards/swy-260829_back.webp"
   },
   {
+    "id": "swy-260829_back",
+    "era": "swy",
+    "member": "back",
+    "category": "Event",
+    "name": "260829 back",
+    "imageUrl": "./cards/swy-260829_back.webp",
+    "backImageUrl": ""
+  },
+  {
+    "id": "swy-back",
+    "era": "swy",
+    "member": "back",
+    "category": "Event",
+    "name": "back",
+    "imageUrl": "./cards/swy-back.webp",
+    "backImageUrl": ""
+  },
+  {
     "id": "swy-260606_student-hs-1",
     "era": "swy",
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-hs-1.webp"
+    "imageUrl": "./cards/swy-260606_student-hs-1.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-hs-2",
@@ -277,7 +365,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-hs-2.webp"
+    "imageUrl": "./cards/swy-260606_student-hs-2.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-hs-3",
@@ -285,7 +374,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-hs-3.webp"
+    "imageUrl": "./cards/swy-260606_student-hs-3.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-hs-4",
@@ -293,7 +383,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-hs-4.webp"
+    "imageUrl": "./cards/swy-260606_student-hs-4.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-hs-5",
@@ -301,7 +392,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-hs-5.webp"
+    "imageUrl": "./cards/swy-260606_student-hs-5.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-hs-6",
@@ -309,7 +401,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-hs-6.webp"
+    "imageUrl": "./cards/swy-260606_student-hs-6.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-hs-7",
@@ -317,7 +410,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-hs-7.webp"
+    "imageUrl": "./cards/swy-260606_student-hs-7.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-hs-8",
@@ -325,7 +419,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-hs-8.webp"
+    "imageUrl": "./cards/swy-260606_student-hs-8.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-sk-1",
@@ -333,7 +428,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-sk-1.webp"
+    "imageUrl": "./cards/swy-260606_student-sk-1.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-sk-2",
@@ -341,7 +437,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-sk-2.webp"
+    "imageUrl": "./cards/swy-260606_student-sk-2.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-sk-3",
@@ -349,7 +446,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-sk-3.webp"
+    "imageUrl": "./cards/swy-260606_student-sk-3.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-sk-4",
@@ -357,7 +455,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-sk-4.webp"
+    "imageUrl": "./cards/swy-260606_student-sk-4.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-sk-5",
@@ -365,7 +464,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-sk-5.webp"
+    "imageUrl": "./cards/swy-260606_student-sk-5.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-sk-6",
@@ -373,7 +473,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-sk-6.webp"
+    "imageUrl": "./cards/swy-260606_student-sk-6.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-sk-7",
@@ -381,7 +482,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-sk-7.webp"
+    "imageUrl": "./cards/swy-260606_student-sk-7.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260606_student-sk-8",
@@ -389,7 +491,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260606 student",
-    "imageUrl": "./cards/swy-260606_student-sk-8.webp"
+    "imageUrl": "./cards/swy-260606_student-sk-8.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-hs-1",
@@ -397,7 +500,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-hs-1.webp"
+    "imageUrl": "./cards/swy-260607_cafe-hs-1.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-hs-2",
@@ -405,7 +509,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-hs-2.webp"
+    "imageUrl": "./cards/swy-260607_cafe-hs-2.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-hs-3",
@@ -413,7 +518,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-hs-3.webp"
+    "imageUrl": "./cards/swy-260607_cafe-hs-3.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-hs-4",
@@ -421,7 +527,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-hs-4.webp"
+    "imageUrl": "./cards/swy-260607_cafe-hs-4.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-hs-5",
@@ -429,7 +536,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-hs-5.webp"
+    "imageUrl": "./cards/swy-260607_cafe-hs-5.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-hs-6",
@@ -437,7 +545,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-hs-6.webp"
+    "imageUrl": "./cards/swy-260607_cafe-hs-6.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-hs-7",
@@ -445,7 +554,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-hs-7.webp"
+    "imageUrl": "./cards/swy-260607_cafe-hs-7.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-hs-8",
@@ -453,7 +563,8 @@
     "member": "Hyesung",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-hs-8.webp"
+    "imageUrl": "./cards/swy-260607_cafe-hs-8.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-sk-1",
@@ -461,7 +572,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-sk-1.webp"
+    "imageUrl": "./cards/swy-260607_cafe-sk-1.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-sk-2",
@@ -469,7 +581,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-sk-2.webp"
+    "imageUrl": "./cards/swy-260607_cafe-sk-2.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-sk-3",
@@ -477,7 +590,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-sk-3.webp"
+    "imageUrl": "./cards/swy-260607_cafe-sk-3.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-sk-4",
@@ -485,7 +599,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-sk-4.webp"
+    "imageUrl": "./cards/swy-260607_cafe-sk-4.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-sk-5",
@@ -493,7 +608,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-sk-5.webp"
+    "imageUrl": "./cards/swy-260607_cafe-sk-5.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-sk-6",
@@ -501,7 +617,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-sk-6.webp"
+    "imageUrl": "./cards/swy-260607_cafe-sk-6.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-sk-7",
@@ -509,7 +626,8 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-sk-7.webp"
+    "imageUrl": "./cards/swy-260607_cafe-sk-7.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-260607_cafe-sk-8",
@@ -517,47 +635,64 @@
     "member": "Sungkook",
     "category": "Video Call",
     "name": "260607 cafe",
-    "imageUrl": "./cards/swy-260607_cafe-sk-8.webp"
+    "imageUrl": "./cards/swy-260607_cafe-sk-8.webp",
+    "backImageUrl": ""
   },
   {
     "id": "Caffeine-260910-Taehwan-20",
     "era": "caf",
     "member": "Taehwan",
     "category": "Event",
-    "name": "260910",
+    "name": 260910,
     "imageUrl": "./cards/Caffeine-260910-Taehwan-20.webp",
     "backImageUrl": "./cards/Caffeine-260910-Taehwan-21.webp"
   },
   {
-    "id": "swy-261017_1-hs",
-    "name": "261017 1",
-    "member": ["Hyesung"],
-    "era": "Still With You",
+<<<<<<< HEAD
+=======
+    "id": "Caffeine-260910-Taehwan-21",
+    "era": "caf",
+    "member": "back",
     "category": "Event",
-    "imageUrl": "./cards/swy-261017_1-hs.webp"
+    "name": 260910,
+    "imageUrl": "./cards/Caffeine-260910-Taehwan-21.webp",
+    "backImageUrl": ""
+  },
+  {
+>>>>>>> c53c9dd190154ac9479ea054d8742eed1160e9e9
+    "id": "swy-261017_1-hs",
+    "era": "Still With You",
+    "member": "Hyesung",
+    "category": "Event",
+    "name": "261017 1",
+    "imageUrl": "./cards/swy-261017_1-hs.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-261017_1-sk",
-    "name": "261017 1",
-    "member": ["Sungkook"],
     "era": "Still With You",
+    "member": "Sungkook",
     "category": "Event",
-    "imageUrl": "./cards/swy-261017_1-sk.webp"
+    "name": "261017 1",
+    "imageUrl": "./cards/swy-261017_1-sk.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-261017_2-hs",
-    "name": "261017 2",
-    "member": ["Hyesung"],
     "era": "Still With You",
+    "member": "Hyesung",
     "category": "Event",
-    "imageUrl": "./cards/swy-261017_2-hs.webp"
+    "name": "261017 2",
+    "imageUrl": "./cards/swy-261017_2-hs.webp",
+    "backImageUrl": ""
   },
   {
     "id": "swy-261017_2-sk",
-    "name": "261017 2",
-    "member": ["Sungkook"],
     "era": "Still With You",
+    "member": "Sungkook",
     "category": "Event",
-    "imageUrl": "./cards/swy-261017_2-sk.webp"
+    "name": "261017 2",
+    "imageUrl": "./cards/swy-261017_2-sk.webp",
+    "backImageUrl": ""
   }
 ]
