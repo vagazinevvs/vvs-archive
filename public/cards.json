@@ -529,30 +529,6 @@
     "backImageUrl": "./cards/Caffeine-260910-Taehwan-21.webp"
   },
   {
-    "id": "other-2025_bday_A_back-sk-5",
-    "name": "2025 bday A back",
-    "member": ["Sungkook"],
-    "era": "other",
-    "category": "Video Call",
-    "imageUrl": "./cards/other-2025_bday_A_back-sk-5.webp"
-  },
-  {
-    "id": "other-2025_bday_B_back-sk-3",
-    "name": "2025 bday B back",
-    "member": ["Sungkook"],
-    "era": "other",
-    "category": "Video Call",
-    "imageUrl": "./cards/other-2025_bday_B_back-sk-3.webp"
-  },
-  {
-    "id": "other-2025_bday_C_back-sk-1",
-    "name": "2025 bday C back",
-    "member": ["Sungkook"],
-    "era": "other",
-    "category": "Video Call",
-    "imageUrl": "./cards/other-2025_bday_C_back-sk-1.webp"
-  },
-  {
     "id": "swy-261017_1-hs",
     "name": "261017 1",
     "member": ["Hyesung"],
