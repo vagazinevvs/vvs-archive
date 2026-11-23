@@ -172,6 +172,9 @@ export const MEMBER_NAME_MAP: Record<string, Record<Language, string>> = {
   taehwan: { en: 'Taehwan', zh: '泰煥', ko: '태환' },
   태환: { en: 'Taehwan', zh: '泰煥', ko: '태환' },
   泰煥: { en: 'Taehwan', zh: '泰煥', ko: '태환' },
+  kotaewoon: { en: 'Ko Taewoon', zh: '高泰澐', ko: '고태운' },
+  고태운: { en: 'Ko Taewoon', zh: '高泰澐', ko: '고태운' },
+  高泰澐: { en: 'Ko Taewoon', zh: '高泰澐', ko: '고태운' },
 
   gon: { en: 'GON', zh: 'GON', ko: '곤' },
   곤: { en: 'GON', zh: 'GON', ko: '곤' },
@@ -193,6 +196,9 @@ export const MEMBER_NAME_MAP: Record<string, Record<Language, string>> = {
   hsk: { en: 'Hyesungkook', zh: '慧成國', ko: '혜성국' },
   혜성국: { en: 'Hyesungkook', zh: '慧成國', ko: '혜성국' },
   慧成國: { en: 'Hyesungkook', zh: '慧成國', ko: '혜성국' },
+
+
+
   
 };
 

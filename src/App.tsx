@@ -76,7 +76,7 @@ const SOCIAL_GROUPS: SocialGroup[] = [
       { platform: 'instagram', url: 'https://www.instagram.com/ofwoon', tooltip: '@ofwoon' },
       { platform: 'x', url: 'https://x.com/kotaewoon_', tooltip: '@kotaewoon_' },
       { platform: 'tiktok', url: 'https://www.tiktok.com/@kotaewoon', tooltip: '@kotaewoon' },
-      { platform: 'instagram', url: 'https://www.instagram.com/channel/AbY648g6LPGlIRrB/', tooltip: 'IG Channel', badge: '專區' },
+      { platform: 'instagram', url: 'https://www.instagram.com/channel/AbY648g6LPGlIRrB/', tooltip: 'IG Channel', badge: '💬' },
     ],
   },
 ];
