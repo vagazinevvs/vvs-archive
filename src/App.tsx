@@ -291,7 +291,7 @@ export default function App() {
       const cardCat = card.category || (card as any).catagory || '';
 
       const matchMember =
-        selectedMembers.has('All') || cardMembers.some((m) => selectedMembers.has(m));
+        selectedMembers.has('All') || Array.from(selectedMembers).every((selected) => cardMembers.includes(selected));
 
       const matchEra = selectedEra === 'All' || card.era === selectedEra;
       const matchCat = selectedCategory === 'All' || cardCat === selectedCategory;

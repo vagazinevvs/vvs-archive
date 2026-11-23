@@ -23,18 +23,34 @@ export const getInitialLanguage = (): Language => {
 // 1. 在對應的語言字典或獨立物件中加入 era 的翻譯
 export const ERA_TRANSLATIONS: Record<Language, Record<string, string>> = {
   en: {
+    "Still With You": "Still With You",
+    "Cafe-in": "Cafe-in",
+    "Twisted Tie": "Twisted Tie",
+    "Other": "Other",
+    // 過渡相容舊縮寫（全數改完後可刪）
     swy: "Still With You",
-    caf: "Caffeine",
-    other: "Other"
+    caf: "Cafe-in",
+    tt: "Twisted Tie",
+    other: "Other",
   },
   zh: {
+    "Still With You": "Still With You",
+    "Cafe-in": "咖啡因",
+    "Twisted Tie": "解不開的我們",
+    "Other": "其他",
     swy: "Still With You",
     caf: "咖啡因",
-    other: "其他"
+    tt: "解不開的我們",
+    other: "其他",
   },
   ko: {
+    "Still With You": "Still With You",
+    "Cafe-in": "카페인",
+    "Twisted Tie": "비틀린 넥타이",
+    "Other": "기타",
     swy: "Still With You",
     caf: "카페인",
+    tt: "비틀린 넥타이",
     other: "기타",
   },
 };
