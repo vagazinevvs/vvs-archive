@@ -23,32 +23,39 @@ class CompactEncoder(json.JSONEncoder):
 
 
 def parse_card_metadata(card_id, category=""):
-    """從檔名解析 era, name, member (格式: era-name-member-number.webp)"""
+    """Parse era, member, and name when building a card entry (backImageUrl filled manually)."""
     parts = card_id.split("-")
-    
+
     if len(parts) >= 3:
-        era = parts[0]
-        # 取第三部分 (index 2) 作為成員代號，並支援底線多成員
-        raw_member = parts[2]
-        member = [m.strip().lower() for m in raw_member.split("_")]
-        # 名稱取中間的部分（例如 era 和 member 之間）
+        raw_era = parts[0].strip()
+        era = ERA_MAPPING.get(raw_era.lower(), raw_era)
+
+        raw_member = parts[2].strip()
+        tokens = [t.strip().lower() for t in raw_member.split("_") if t.strip() and t.strip().lower() != "back"]
+
+        members = []
+        for t in tokens:
+            members.extend(map_member_token(t))
+        member = ", ".join(dict.fromkeys(members))
         card_name = "-".join(parts[1:2]).replace("_", " ")
     elif len(parts) == 2:
-        era = parts[0]
+        raw_era = parts[0].strip()
+        era = ERA_MAPPING.get(raw_era.lower(), raw_era)
         card_name = parts[1].replace("_", " ")
-        member = []
+        member = ""
     else:
         era = ""
         card_name = card_id.replace("_", " ")
-        member = []
-        
+        member = ""
+
     return {
         "id": card_id,
-        "name": card_name,
-        "member": member,
         "era": era,
+        "member": member,
         "category": category,
-        "imageUrl": f"./cards/{card_id}.webp"
+        "name": card_name,
+        "imageUrl": f"./cards/{card_id}.webp",
+        "backImageUrl": "",
     }
 
 def process_pipeline():

@@ -47,3 +47,12 @@ def normalize_side(side: str) -> str:
         return ""
     cleaned = str(side).strip().lower()
     return SIDE_MAPPING.get(cleaned, str(side).strip())
+
+def map_member_token(token: str) -> list[str]:
+    cleaned = str(token).strip().lower()
+    if not cleaned:
+        return []
+    mapped = MEMBER_MAPPING.get(cleaned, str(token).strip())
+    if isinstance(mapped, list):
+        return [str(m).strip() for m in mapped if str(m).strip()]
+    return [str(mapped).strip()] if str(mapped).strip() else []

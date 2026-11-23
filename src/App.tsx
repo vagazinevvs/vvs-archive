@@ -42,6 +42,13 @@ interface SocialLinkItem {
 }
 
 const SOCIAL_LINKS: SocialLinkItem[] = [
+  // 慧成 x 成國 (혜성국)
+  {
+    label: '혜성국',
+    subLabel: '@hyesungkook_official',
+    url: 'https://www.instagram.com/hyesungkook_official',
+    platform: 'instagram',
+  },
   {
     label: '혜성국',
     subLabel: '@HyesungKook',
@@ -55,9 +62,31 @@ const SOCIAL_LINKS: SocialLinkItem[] = [
     platform: 'youtube',
   },
   {
+    label: '혜성국',
+    subLabel: '@hyesungkook_official_',
+    url: 'https://www.tiktok.com/@hyesungkook_official_',
+    platform: 'tiktok',
+  },
+
+  // 慧成 (박혜성)
+  {
     label: '박혜성 𝗣𝗮𝗿𝗸 𝗛𝘆𝗲 𝗦𝘂𝗻𝗴',
     subLabel: '@phey._.s',
     url: 'http://instagram.com/phey._.s',
+    platform: 'instagram',
+  },
+  {
+    label: 'Honeylog',
+    subLabel: 'Naver Blog',
+    url: 'https://blog.naver.com/hsboy0729',
+    platform: 'blog',
+  },
+
+  // 成國 (Sungkook)
+  {
+    label: '성국 Sungkook',
+    subLabel: '@imtjdrnr',
+    url: 'https://www.instagram.com/imtjdrnr',
     platform: 'instagram',
   },
   {
@@ -66,22 +95,30 @@ const SOCIAL_LINKS: SocialLinkItem[] = [
     url: 'http://x.com/_sungkook',
     platform: 'x',
   },
+
+  // 泰煥 (Taehwan)
   {
-    label: '성국 Sungkook',
-    subLabel: '@imtjdrnr',
-    url: 'https://www.instagram.com/imtjdrnr',
+    label: '고태운',
+    subLabel: '@ofwoon',
+    url: 'https://www.instagram.com/ofwoon',
     platform: 'instagram',
   },
   {
     label: '고태운',
     subLabel: '@kotaewoon_',
-    url: 'https://x.com/kotaewoon_',
+    url: 'http://x.com/kotaewoon_',
     platform: 'x',
   },
   {
     label: '고태운',
-    subLabel: '@ofwoon',
-    url: 'https://www.instagram.com/ofwoon',
+    subLabel: '@kotaewoon',
+    url: 'https://www.tiktok.com/@kotaewoon',
+    platform: 'tiktok',
+  },
+  {
+    label: '고태운 IG專區',
+    subLabel: 'Broadcast Channel',
+    url: 'https://www.instagram.com/channel/AbY648g6LPGlIRrB/',
     platform: 'instagram',
   },
 ];
