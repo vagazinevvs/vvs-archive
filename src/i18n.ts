@@ -58,8 +58,11 @@ export const ERA_TRANSLATIONS: Record<Language, Record<string, string>> = {
 // 2. 建立格式化 Era 的函式
 export const formatEraName = (eraKey: string, lang: Language): string => {
   if (!eraKey) return '';
-  const lowerKey = eraKey.toLowerCase();
-  return ERA_TRANSLATIONS[lang]?.[lowerKey] || eraKey;
+  return (
+    ERA_TRANSLATIONS[lang]?.[eraKey] ||
+    ERA_TRANSLATIONS[lang]?.[eraKey.toLowerCase()] ||
+    eraKey
+  );
 };
 
 export const CATEGORY_TRANSLATIONS: Record<Language, Record<string, string>> = {
@@ -186,6 +189,10 @@ export const MEMBER_NAME_MAP: Record<string, Record<Language, string>> = {
   泳光: { en: 'Yeongkwang', zh: '泳光', ko: '영광' },
 
   other: { en: 'Other', zh: '其他', ko: '기타' },
+
+  hsk: { en: 'Hyesungkook', zh: '慧成國', ko: '혜성국' },
+  혜성국: { en: 'Hyesungkook', zh: '慧成國', ko: '혜성국' },
+  慧成國: { en: 'Hyesungkook', zh: '慧成國', ko: '혜성국' },
   
 };
 

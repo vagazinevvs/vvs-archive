@@ -34,92 +34,50 @@ const STORAGE_KEY_WANTED = 'vanner_wanted_cards';
 const SUBMISSION_FORM_URL = import.meta.env.VITE_FORM_URL || 'https://forms.gle/iTWDSb1ddmCRPBiV7';
 const CARDS_PER_PAGE = 30;
 
-interface SocialLinkItem {
-  label: string;
-  subLabel: string;
+interface SocialIconLink {
+  platform: 'youtube' | 'x' | 'instagram' | 'tiktok' | 'blog' | 'fromm';
   url: string;
-  platform: 'youtube' | 'x' | 'instagram' | 'tiktok' | 'blog';
+  tooltip: string; // hover 顯示帳號或說明
+  badge?: string;  // 僅少數特殊連結（如 IG專區）加極短標記
 }
 
-const SOCIAL_LINKS: SocialLinkItem[] = [
-  // 慧成 x 成國 (혜성국)
-  {
-    label: '혜성국',
-    subLabel: '@hyesungkook_official',
-    url: 'https://www.instagram.com/hyesungkook_official',
-    platform: 'instagram',
-  },
-  {
-    label: '혜성국',
-    subLabel: '@HyesungKook',
-    url: 'http://x.com/HyesungKook',
-    platform: 'x',
-  },
-  {
-    label: '뭐혜성국',
-    subLabel: 'YouTube',
-    url: 'https://www.youtube.com/channel/UCLfafqmR8Ku3_8ZCarWxYIQ',
-    platform: 'youtube',
-  },
-  {
-    label: '혜성국',
-    subLabel: '@hyesungkook_official_',
-    url: 'https://www.tiktok.com/@hyesungkook_official_',
-    platform: 'tiktok',
-  },
+interface SocialGroup {
+  name: string;
+  links: SocialIconLink[];
+}
 
-  // 慧成 (박혜성)
+const SOCIAL_GROUPS: SocialGroup[] = [
   {
-    label: '박혜성 𝗣𝗮𝗿𝗸 𝗛𝘆𝗲 𝗦𝘂𝗻𝗴',
-    subLabel: '@phey._.s',
-    url: 'http://instagram.com/phey._.s',
-    platform: 'instagram',
+    name: '혜성국',
+    links: [
+      { platform: 'instagram', url: 'https://www.instagram.com/hyesungkook_official', tooltip: '@hyesungkook_official' },
+      { platform: 'x', url: 'https://x.com/HyesungKook', tooltip: '@HyesungKook' },
+      { platform: 'youtube', url: 'https://www.youtube.com/channel/UCLfafqmR8Ku3_8ZCarWxYIQ', tooltip: '뭐혜성국 YouTube' },
+      { platform: 'tiktok', url: 'https://www.tiktok.com/@hyesungkook_official_', tooltip: '@hyesungkook_official_' },
+    ],
   },
   {
-    label: 'Honeylog',
-    subLabel: 'Naver Blog',
-    url: 'https://blog.naver.com/hsboy0729',
-    platform: 'blog',
-  },
-
-  // 成國 (Sungkook)
-  {
-    label: '성국 Sungkook',
-    subLabel: '@imtjdrnr',
-    url: 'https://www.instagram.com/imtjdrnr',
-    platform: 'instagram',
+    name: '혜성',
+    links: [
+      { platform: 'instagram', url: 'https://instagram.com/phey._.s', tooltip: '@phey._.s' },
+      { platform: 'blog', url: 'https://blog.naver.com/hsboy0729', tooltip: 'Honeylog' },
+    ],
   },
   {
-    label: '성국',
-    subLabel: '@_sungkook',
-    url: 'http://x.com/_sungkook',
-    platform: 'x',
-  },
-
-  // 泰煥 (Taehwan)
-  {
-    label: '고태운',
-    subLabel: '@ofwoon',
-    url: 'https://www.instagram.com/ofwoon',
-    platform: 'instagram',
+    name: '성국',
+    links: [
+      { platform: 'instagram', url: 'https://www.instagram.com/imtjdrnr', tooltip: '@imtjdrnr' },
+      { platform: 'x', url: 'https://x.com/_sungkook', tooltip: '@_sungkook' },
+    ],
   },
   {
-    label: '고태운',
-    subLabel: '@kotaewoon_',
-    url: 'http://x.com/kotaewoon_',
-    platform: 'x',
-  },
-  {
-    label: '고태운',
-    subLabel: '@kotaewoon',
-    url: 'https://www.tiktok.com/@kotaewoon',
-    platform: 'tiktok',
-  },
-  {
-    label: '고태운 IG專區',
-    subLabel: 'Broadcast Channel',
-    url: 'https://www.instagram.com/channel/AbY648g6LPGlIRrB/',
-    platform: 'instagram',
+    name: '고태운',
+    links: [
+      { platform: 'instagram', url: 'https://www.instagram.com/ofwoon', tooltip: '@ofwoon' },
+      { platform: 'x', url: 'https://x.com/kotaewoon_', tooltip: '@kotaewoon_' },
+      { platform: 'tiktok', url: 'https://www.tiktok.com/@kotaewoon', tooltip: '@kotaewoon' },
+      { platform: 'instagram', url: 'https://www.instagram.com/channel/AbY648g6LPGlIRrB/', tooltip: 'IG Channel', badge: '專區' },
+    ],
   },
 ];
 
@@ -1024,61 +982,95 @@ export default function App() {
             <span className="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">
               Members Links
             </span>
-            <div className="flex flex-wrap items-center justify-center gap-2 max-w-2xl">
-              {SOCIAL_LINKS.map((item) => (
-                <a
-                  key={`${item.platform}-${item.url}`}
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`flex items-center gap-2 rounded-xl border px-3 py-2 transition active:scale-98 shadow-xs ${isDark ? 'border-neutral-800/90 bg-neutral-900/80 text-neutral-300 hover:border-neutral-700 hover:bg-neutral-800 hover:text-white' : 'border-neutral-200 bg-neutral-50 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-100 hover:text-black'}`}
-                >
-                  {item.platform === 'youtube' && (
-                    <svg className="h-4 w-4 fill-red-500 shrink-0" viewBox="0 0 24 24">
-                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                    </svg>
-                  )}
-
-                  {item.platform === 'instagram' && (
-                    <svg
-                      className="h-4 w-4 stroke-rose-400 shrink-0"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
+            <div className="mx-auto flex w-fit flex-col gap-2">
+              {SOCIAL_GROUPS.map((group) => {
+                const groupLabel = formatMemberName(group.name, currentLang);
+                return (
+                  <div key={group.name} className="flex items-center justify-between gap-4">
+                    <span
+                      className={`min-w-[6rem] text-left text-xs font-bold ${
+                        isDark ? 'text-neutral-300' : 'text-neutral-700'
+                      }`}
                     >
-                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-                    </svg>
-                  )}
-
-                  {item.platform === 'x' && (
-                    <span className={`font-bold text-sm leading-none shrink-0 ${isDark ? 'text-neutral-200' : 'text-neutral-800'}`}>𝕏</span>
-                  )}
-
-                  {item.platform === 'tiktok' && (
-                    <svg
-                      className={`h-4 w-4 shrink-0 ${isDark ? 'fill-neutral-200' : 'fill-neutral-800'}`}
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
-                    </svg>
-                  )}
-
-                  {item.platform === 'blog' && (
-                    <span className="flex h-4 w-4 items-center justify-center rounded-xs bg-emerald-500 text-[10px] font-black text-white shrink-0">
-                      N
+                      {groupLabel}
                     </span>
-                  )}
+                    <div className="flex items-center gap-1.5">
+                      {group.links.map((item) => (
+                        <a
+                          key={item.url}
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={item.tooltip}
+                          aria-label={`${groupLabel} - ${item.tooltip}`}
+                          className={`flex h-7 items-center gap-1 rounded-lg border px-2 transition active:scale-95 ${
+                            isDark
+                              ? 'border-neutral-800 bg-neutral-900/80 text-neutral-300 hover:border-neutral-700 hover:bg-neutral-800 hover:text-white'
+                              : 'border-neutral-200 bg-neutral-50 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-100 hover:text-black'
+                          }`}
+                        >
+                          {item.platform === 'youtube' && (
+                            <svg className="h-4 w-4 fill-red-500 shrink-0" viewBox="0 0 24 24">
+                              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                            </svg>
+                          )}
 
-                  <div className="text-left leading-tight">
-                    <p className={`text-xs font-bold ${isDark ? 'text-neutral-200' : 'text-neutral-900'}`}>{item.label}</p>
-                    <p className="text-[10px] text-neutral-400">{item.subLabel}</p>
+                          {item.platform === 'instagram' && (
+                            <svg
+                              className="h-4 w-4 stroke-rose-400 shrink-0"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
+                              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                              <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
+                            </svg>
+                          )}
+
+                          {item.platform === 'x' && (
+                            <span className={`font-bold text-sm leading-none shrink-0 ${isDark ? 'text-neutral-200' : 'text-neutral-800'}`}>
+                              𝕏
+                            </span>
+                          )}
+
+                          {item.platform === 'tiktok' && (
+                            <svg
+                              className={`h-4 w-4 shrink-0 ${isDark ? 'fill-neutral-200' : 'fill-neutral-800'}`}
+                              viewBox="0 0 24 24"
+                            >
+                              <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z" />
+                            </svg>
+                          )}
+
+                          {item.platform === 'blog' && (
+                            <span className="flex h-4 w-4 items-center justify-center rounded-xs bg-emerald-500 text-[10px] font-black text-white shrink-0">
+                              N
+                            </span>
+                          )}
+
+                          {item.platform === 'fromm' && (
+                            <svg
+                              className="h-4 w-4 stroke-sky-400 shrink-0"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+                            </svg>
+                          )}
+
+                          {item.badge && <span className="text-[10px] font-medium">{item.badge}</span>}
+                        </a>
+                      ))}
+                    </div>
                   </div>
-                </a>
-              ))}
+                );
+              })}
             </div>
           </div>
 
