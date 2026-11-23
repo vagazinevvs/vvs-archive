@@ -170,7 +170,6 @@ export const MEMBER_NAME_MAP: Record<string, Record<Language, string>> = {
   泳光: { en: 'Yeongkwang', zh: '泳光', ko: '영광' },
 
   other: { en: 'Other', zh: '其他', ko: '기타' },
- 
   
 };
 

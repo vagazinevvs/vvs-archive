@@ -73,138 +73,124 @@ def four_point_transform(image, pts):
 #     return np.clip(result, 0, 255).astype(np.uint8)
 
 
-def apply_white_balance(bgr_img):
+def apply_white_balance(bgr_img, max_gain=1.35):
     h, w = bgr_img.shape[:2]
-    corner_h = int(h * 0.12)
-    corner_w = int(w * 0.12)
-    
+    corner_h = max(1, int(h * 0.12))
+    corner_w = max(1, int(w * 0.12))
+
     corners = {
         "tl": bgr_img[0:corner_h, 0:corner_w],
-        "tr": bgr_img[0:corner_h, w-corner_w:w],
-        "bl": bgr_img[h-corner_h:h, 0:corner_w],
-        "br": bgr_img[h-corner_h:h, w-corner_w:w]
+        "tr": bgr_img[0:corner_h, w - corner_w : w],
+        "bl": bgr_img[h - corner_h : h, 0:corner_w],
+        "br": bgr_img[h - corner_h : h, w - corner_w : w],
     }
-    
-    # Collect all corner patches to evaluate extreme values (either very bright white or very dark black)
-    all_corner_means = []
-    for key, patch in corners.items():
-        b_mean = np.mean(patch[:, :, 0])
-        g_mean = np.mean(patch[:, :, 1])
-        r_mean = np.mean(patch[:, :, 2])
-        brightness = (b_mean + g_mean + r_mean) / 3.0
-        all_corner_means.append(brightness)
-        
-    # Determine if the background is predominantly white or black based on extremes
-    median_brightness = np.median(all_corner_means)
+
+    corner_means = []
+    for patch in corners.values():
+        b_m = float(np.mean(patch[:, :, 0]))
+        g_m = float(np.mean(patch[:, :, 1]))
+        r_m = float(np.mean(patch[:, :, 2]))
+        corner_means.append((b_m + g_m + r_m) / 3.0)
+
+    median_brightness = float(np.median(corner_means))
     target_is_white = median_brightness > 127.5
-    
-    best_bg = None
+
     if target_is_white:
-        # Pick the corner with the highest brightness (whitest)
-        max_score = -float('inf')
-        for key, patch in corners.items():
-            brightness = np.mean(patch)
-            if brightness > max_score:
-                max_score = brightness
-                best_bg = patch
+        best_bg = max(corners.values(), key=lambda p: float(np.mean(p)))
     else:
-        # Pick the corner with the lowest brightness (blackest)
-        min_score = float('inf')
-        for key, patch in corners.items():
-            brightness = np.mean(patch)
-            if brightness < min_score:
-                min_score = brightness
-                best_bg = patch
-                
-    if best_bg is None:
-        best_bg = corners["tr"]
-        
-    average_b = np.mean(best_bg[:, :, 0])
-    average_g = np.mean(best_bg[:, :, 1])
-    average_r = np.mean(best_bg[:, :, 2])
-    
+        best_bg = min(corners.values(), key=lambda p: float(np.mean(p)))
+
+    avg_b = float(np.mean(best_bg[:, :, 0]))
+    avg_g = float(np.mean(best_bg[:, :, 1]))
+    avg_r = float(np.mean(best_bg[:, :, 2]))
+
     result = bgr_img.astype(np.float32)
-    if target_is_white:
-        average = (average_b + average_g + average_r) / 3.0
-        if average_b > 0: result[:, :, 0] *= (average / average_b)
-        if average_g > 0: result[:, :, 1] *= (average / average_g)
-        if average_r > 0: result[:, :, 1] *= (average / average_r) # Fixed typo bounds
-    else:
-        # For black balance/normalization if needed, keep channels balanced relative to background floor
-        pass
-    
+
+    if target_is_white and avg_b > 0 and avg_g > 0 and avg_r > 0:
+        avg_all = (avg_b + avg_g + avg_r) / 3.0
+        gain_b = np.clip(avg_all / avg_b, 1.0 / max_gain, max_gain)
+        gain_g = np.clip(avg_all / avg_g, 1.0 / max_gain, max_gain)
+        gain_r = np.clip(avg_all / avg_r, 1.0 / max_gain, max_gain)
+
+        result[:, :, 0] *= gain_b
+        result[:, :, 1] *= gain_g
+        result[:, :, 2] *= gain_r  # Fixed: apply Red gain to channel 2 (R), not channel 1 (G)
+
     return np.clip(result, 0, 255).astype(np.uint8)
 
-def crop_card(image_input, debug_dir=None):
-    if isinstance(image_input, str):
-        img = cv2.imread(image_input)
-    else:
-        img = image_input
-        
+def crop_card(image_input, debug_dir=None, inset_ratio=0.96):
+    img = cv2.imread(image_input) if isinstance(image_input, str) else image_input
     if img is None:
         raise ValueError("Unable to read image for cropping")
-    
+
     h, w = img.shape[:2]
     img_area = h * w
-    
+
+    # Enhance local contrast to separate light-toned borders from card edges
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    filtered = cv2.bilateralFilter(gray, 11, 35, 35)
-    edged = cv2.Canny(filtered, 15, 60)
-    
-    kernel = np.ones((21, 11), np.uint8)
-    closed = cv2.morphologyEx(edged, cv2.MORPH_CLOSE, kernel, iterations=3)
-    
+    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    enhanced = clahe.apply(gray)
+    filtered = cv2.bilateralFilter(enhanced, 9, 50, 50)
+
+    edged = cv2.Canny(filtered, 35, 110)
+    grad_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+    grad = cv2.morphologyEx(filtered, cv2.MORPH_GRADIENT, grad_kernel)
+    _, grad_bin = cv2.threshold(grad, 22, 255, cv2.THRESH_BINARY)
+
+    combined = cv2.bitwise_or(edged, grad_bin)
+    close_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+    closed = cv2.morphologyEx(combined, cv2.MORPH_CLOSE, close_kernel, iterations=1)
+
     if debug_dir:
         os.makedirs(debug_dir, exist_ok=True)
         cv2.imwrite(os.path.join(debug_dir, "diag_filtered.jpg"), filtered)
         cv2.imwrite(os.path.join(debug_dir, "diag_edged.jpg"), edged)
         cv2.imwrite(os.path.join(debug_dir, "diag_closed.jpg"), closed)
-    
+
     contours, _ = cv2.findContours(closed.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-    
     card_crop = None
-    
+
     if contours:
         contours = sorted(contours, key=cv2.contourArea, reverse=True)
         for c in contours:
             area = cv2.contourArea(c)
-            if area > (img_area * 0.10):
-                hull = cv2.convexHull(c)
-                rect = cv2.minAreaRect(hull)
-                box = cv2.boxPoints(rect)
-                pts = box.astype("float32")
-                
-                w_box = np.linalg.norm(pts[0] - pts[1])
-                h_box = np.linalg.norm(pts[1] - pts[2])
-                if w_box == 0 or h_box == 0:
-                    continue
-                
-                ratio = min(w_box, h_box) / max(w_box, h_box)
-                
-                if 0.5 <= ratio <= 0.8:
-                    center = np.mean(pts, axis=0)
-                    # 調整為 0.99 以完美貼合實際邊緣
-                    pts = center + (pts - center) * 0.99
-                    
-                    card_crop = four_point_transform(img, pts)
-                    break
+            if not (img_area * 0.18 < area < img_area * 0.85):
+                continue
+
+            hull = cv2.convexHull(c)
+            rect = cv2.minAreaRect(hull)
+            (_, _), (box_w, box_h), angle = rect
+
+            if box_w < 20 or box_h < 20:
+                continue
+
+            ratio = min(box_w, box_h) / max(box_w, box_h)
+            if 0.54 <= ratio <= 0.76:
+                pts = cv2.boxPoints(rect).astype("float32")
+                center = np.mean(pts, axis=0)
+                # Trim slightly inward to remove rounded corner margins and white border
+                trimmed = center + (pts - center) * inset_ratio
+                trimmed[:, 0] = np.clip(trimmed[:, 0], 0, w - 1)
+                trimmed[:, 1] = np.clip(trimmed[:, 1], 0, h - 1)
+                card_crop = four_point_transform(img, trimmed)
+                break
 
     if card_crop is None:
         target_aspect = 55.0 / 85.0
         if (w / h) > target_aspect:
-            crop_h = int(h * 0.85)
+            crop_h = int(h * 0.86)
             crop_w = int(crop_h * target_aspect)
         else:
-            crop_w = int(w * 0.85)
+            crop_w = int(w * 0.86)
             crop_h = int(crop_w / target_aspect)
-            
-        start_x = (w - crop_w) // 2
-        start_y = (h - crop_h) // 2
-        card_crop = img[start_y:start_y+crop_h, start_x:start_x+crop_w]
-        
+
+        start_x = max(0, (w - crop_w) // 2)
+        start_y = max(0, (h - crop_h) // 2)
+        card_crop = img[start_y : start_y + crop_h, start_x : start_x + crop_w]
+
     if card_crop.shape[1] > card_crop.shape[0]:
         card_crop = cv2.rotate(card_crop, cv2.ROTATE_90_CLOCKWISE)
-        
+
     return card_crop
 
 def apply_watermark(bgr_image, watermark_text="VVS ARCHIVE"):
