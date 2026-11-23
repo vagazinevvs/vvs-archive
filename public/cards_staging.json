@@ -1,34 +1,98 @@
 [
   {
-    "id": "swy-261017_1-hs",
-    "name": "261017 1",
+    "id": "swy-260805-hs-1",
+    "name": "260805",
     "member": ["hs"],
     "era": "swy",
-    "category": "Event",
-    "imageUrl": "./cards/swy-261017_1-hs.webp"
+    "category": "Video Call",
+    "imageUrl": "./cards/swy-260805-hs-1.webp"
   },
   {
-    "id": "swy-261017_1-sk",
-    "name": "261017 1",
-    "member": ["sk"],
-    "era": "swy",
-    "category": "Event",
-    "imageUrl": "./cards/swy-261017_1-sk.webp"
-  },
-  {
-    "id": "swy-261017_2-hs",
-    "name": "261017 2",
+    "id": "swy-260805-hs-2",
+    "name": "260805",
     "member": ["hs"],
     "era": "swy",
-    "category": "Event",
-    "imageUrl": "./cards/swy-261017_2-hs.webp"
+    "category": "Video Call",
+    "imageUrl": "./cards/swy-260805-hs-2.webp"
   },
   {
-    "id": "swy-261017_2-sk",
-    "name": "261017 2",
+    "id": "swy-260805-hsk-1",
+    "name": "260805",
+    "member": ["hsk"],
+    "era": "swy",
+    "category": "Video Call",
+    "imageUrl": "./cards/swy-260805-hsk-1.webp"
+  },
+  {
+    "id": "swy-260805-hsk-2",
+    "name": "260805",
+    "member": ["hsk"],
+    "era": "swy",
+    "category": "Video Call",
+    "imageUrl": "./cards/swy-260805-hsk-2.webp"
+  },
+  {
+    "id": "swy-260805-sk-1",
+    "name": "260805",
     "member": ["sk"],
     "era": "swy",
-    "category": "Event",
-    "imageUrl": "./cards/swy-261017_2-sk.webp"
+    "category": "Video Call",
+    "imageUrl": "./cards/swy-260805-sk-1.webp"
+  },
+  {
+    "id": "swy-260805-sk-2",
+    "name": "260805",
+    "member": ["sk"],
+    "era": "swy",
+    "category": "Video Call",
+    "imageUrl": "./cards/swy-260805-sk-2.webp"
+  },
+  {
+    "id": "swy-260808-hs-1",
+    "name": "260808",
+    "member": ["hs"],
+    "era": "swy",
+    "category": "Video Call",
+    "imageUrl": "./cards/swy-260808-hs-1.webp"
+  },
+  {
+    "id": "swy-260808-hs-2",
+    "name": "260808",
+    "member": ["hs"],
+    "era": "swy",
+    "category": "Video Call",
+    "imageUrl": "./cards/swy-260808-hs-2.webp"
+  },
+  {
+    "id": "swy-260808-hsk-1",
+    "name": "260808",
+    "member": ["hsk"],
+    "era": "swy",
+    "category": "Video Call",
+    "imageUrl": "./cards/swy-260808-hsk-1.webp"
+  },
+  {
+    "id": "swy-260808-hsk-2",
+    "name": "260808",
+    "member": ["hsk"],
+    "era": "swy",
+    "category": "Video Call",
+    "imageUrl": "./cards/swy-260808-hsk-2.webp"
+  },
+  {
+    "id": "swy-260808-sk-1",
+    "name": "260808",
+    "member": ["sk"],
+    "era": "swy",
+    "category": "Video Call",
+    "imageUrl": "./cards/swy-260808-sk-1.webp"
+  },
+  {
+    "id": "swy-260808-sk-2",
+    "name": "260808",
+    "member": ["sk"],
+    "era": "swy",
+    "category": "Video Call",
+    "imageUrl": "./cards/swy-260808-sk-2.webp"
   }
 ]
